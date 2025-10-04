@@ -1,7 +1,11 @@
 ﻿<Solution>
   <Folder Name="/src/" />
   <Folder Name="/src/Core/">
+    <Project Path="src\Core\FrontendMentor.InvoiceApp.Application\FrontendMentor.InvoiceApp.Application.csproj" Type="Classic C#" />
     <Project Path="src\Core\FrontendMentor.InvoiceApp.Domain\FrontendMentor.InvoiceApp.Domain.csproj" Type="Classic C#" />
+  </Folder>
+  <Folder Name="/src/Infrastructure/">
+    <Project Path="src\Infrastructure\FrontendMentor.InvoiceApp.Data\FrontendMentor.InvoiceApp.Data.csproj" Type="Classic C#" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests\FrontendMentor.InvoiceApp.Domain.Tests\FrontendMentor.InvoiceApp.Domain.Tests.csproj" Type="Classic C#" />
