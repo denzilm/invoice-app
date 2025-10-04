@@ -1,1 +1,8 @@
-﻿<Solution />
+﻿<Solution>
+  <Folder Name="/src/">
+    <Project Path="src\server\Core\FrontendMentor.InvoiceApp.Domain\FrontendMentor.InvoiceApp.Domain.csproj" Type="Classic C#" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests\FrontendMentor.InvoiceApp.Domain.Tests\FrontendMentor.InvoiceApp.Domain.Tests.csproj" Type="Classic C#" />
+  </Folder>
+</Solution>
