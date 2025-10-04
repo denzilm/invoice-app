@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\server\Core\FrontendMentor.InvoiceApp.Domain\FrontendMentor.InvoiceApp.Domain.csproj" />
+        <ProjectReference Include="..\..\src\Core\FrontendMentor.InvoiceApp.Domain\FrontendMentor.InvoiceApp.Domain.csproj" />
     </ItemGroup>
 
 </Project>
