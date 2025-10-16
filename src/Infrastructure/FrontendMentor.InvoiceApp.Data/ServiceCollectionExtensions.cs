@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FrontendMentor.InvoiceApp.Application.Abstractions.Repositories;
+using FrontendMentor.InvoiceApp.Data.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -43,6 +45,8 @@ public static class ServiceCollectionExtensions
                         CoreEventId.RowLimitingOperationWithoutOrderByWarning);
             });
         });
+
+        services.AddScoped<ICountryRepository, CountryRepository>();
 
         return services;
     }
