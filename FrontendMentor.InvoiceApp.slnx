@@ -10,6 +10,9 @@
   <Folder Name="/src/Infrastructure/">
     <Project Path="src\Infrastructure\FrontendMentor.InvoiceApp.Data\FrontendMentor.InvoiceApp.Data.csproj" Type="Classic C#" />
   </Folder>
+  <Folder Name="/src/Shared/">
+    <Project Path="src\Shared\FrontendMentor.InvoiceApp.Shared.Hosting\FrontendMentor.InvoiceApp.Shared.Hosting.csproj" Type="Classic C#" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests\FrontendMentor.InvoiceApp.Domain.Tests\FrontendMentor.InvoiceApp.Domain.Tests.csproj" Type="Classic C#" />
   </Folder>
