@@ -2,4 +2,12 @@
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="Serilog.AspNetCore" />
+      <PackageReference Include="Serilog.Enrichers.Environment" />
+      <PackageReference Include="Serilog.Enrichers.Memory" />
+      <PackageReference Include="Serilog.Enrichers.Process" />
+      <PackageReference Include="Serilog.Exceptions" />
+      <PackageReference Include="Serilog.Sinks.Seq" />
+    </ItemGroup>
 </Project>
