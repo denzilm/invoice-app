@@ -1,5 +1,8 @@
 ﻿<Solution>
   <Folder Name="/src/" />
+  <Folder Name="/src/APIs/">
+    <Project Path="src\APIs\FrontendMentor.InvoiceApp.Api\FrontendMentor.InvoiceApp.Api.csproj" Type="Classic C#" />
+  </Folder>
   <Folder Name="/src/Core/">
     <Project Path="src\Core\FrontendMentor.InvoiceApp.Application\FrontendMentor.InvoiceApp.Application.csproj" Type="Classic C#" />
     <Project Path="src\Core\FrontendMentor.InvoiceApp.Domain\FrontendMentor.InvoiceApp.Domain.csproj" Type="Classic C#" />
