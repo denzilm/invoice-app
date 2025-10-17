@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
@@ -9,14 +8,14 @@ namespace FrontendMentor.InvoiceApp.Shared.Hosting.Logging;
 
 public static class Logging
 {
-    public static void Setup(IHostEnvironment environment, IConfiguration configuration)
+    public static void Setup(IHostEnvironment environment, string serverUrl)
     {
         ArgumentNullException.ThrowIfNull(environment);
-        ArgumentNullException.ThrowIfNull(configuration);
+        ArgumentException.ThrowIfNullOrEmpty(serverUrl);
 
         if (environment.IsDevelopment())
         {
-            Log.Logger = CreateCommonLoggerConfiguration(configuration)
+            Log.Logger = CreateCommonLoggerConfiguration(serverUrl)
                 .MinimumLevel.Verbose()
                 .WriteTo.Console(
                     outputTemplate:
@@ -26,13 +25,13 @@ public static class Logging
         }
         else
         {
-            Log.Logger = CreateCommonLoggerConfiguration(configuration)
+            Log.Logger = CreateCommonLoggerConfiguration(serverUrl)
                 .MinimumLevel.Information()
                 .CreateLogger();
         }
     }
 
-    private static LoggerConfiguration CreateCommonLoggerConfiguration(IConfiguration configuration)
+    private static LoggerConfiguration CreateCommonLoggerConfiguration(string serverUrl)
     {
         return new LoggerConfiguration()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
@@ -44,6 +43,6 @@ public static class Logging
             .Enrich.WithProcessId()
             .Enrich.WithProcessName()
             .Enrich.WithMemoryUsage()
-            .WriteTo.Seq(serverUrl: configuration.GetConnectionString("Seq")!);
+            .WriteTo.Seq(serverUrl);
     }
 }
