@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/Shared/" />
+  <Folder Name="/Shared/Infrastructure/" />
+  <Folder Name="/Shared/Infrastructure/src/">
+    <Project Path="Shared/src/FrontendMentor.InvoiceApp.Messaging/FrontendMentor.InvoiceApp.Messaging.csproj" />
+  </Folder>
+</Solution>
