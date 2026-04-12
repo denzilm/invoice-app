@@ -1,7 +1,12 @@
 <Solution>
   <Folder Name="/Shared/" />
-  <Folder Name="/Shared/Infrastructure/" />
-  <Folder Name="/Shared/Infrastructure/src/">
-    <Project Path="Shared/src/FrontendMentor.InvoiceApp.Messaging/FrontendMentor.InvoiceApp.Messaging.csproj" />
+  <Folder Name="/Shared/src/">
+    <Project Path="Shared/src/FrontendMentor.InvoiceApp.Shared/FrontendMentor.InvoiceApp.Shared.csproj" />
+  </Folder>
+  <Folder Name="/Shared/src/Infrastructure/">
+    <Project Path="Shared/src/Infrastructure/FrontendMentor.InvoiceApp.Messaging/FrontendMentor.InvoiceApp.Messaging.csproj" />
+  </Folder>
+  <Folder Name="/Shared/tests/">
+    <Project Path="Shared/tests/FrontendMentor.InvoiceApp.Shared.Tests/FrontendMentor.InvoiceApp.Shared.Tests.csproj" />
   </Folder>
 </Solution>
