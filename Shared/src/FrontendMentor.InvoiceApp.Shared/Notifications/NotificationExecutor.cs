@@ -30,26 +30,20 @@ internal sealed class NotificationExecutor : INotificationExecutor
         switch (strategy)
         {
             case NotificationExecutionStrategy.Parallel:
-                await Parallel.ForEachAsync(handlers, cancellationToken, async (handlerType, ct) =>
-                {
-                    await ExecuteHandler(notification, handlerType, ct);
-                });
+                await Parallel.ForEachAsync(handlers, cancellationToken,
+                    (handlerType, ct) => ExecuteHandler(notification, handlerType, ct));
                 break;
             case NotificationExecutionStrategy.Sequential:
-            {
                 foreach (var handlerType in handlers)
-                {
                     await ExecuteHandler(notification, handlerType, cancellationToken);
-                }
 
                 break;
-            }
             default:
                 throw new ArgumentOutOfRangeException(nameof(strategy), strategy, null);
         }
     }
 
-    private async Task ExecuteHandler<T>(T notification, Type handlerType, CancellationToken ct) where T : INotification
+    private async ValueTask ExecuteHandler<T>(T notification, Type handlerType, CancellationToken ct) where T : INotification
     {
         using var scope = _serviceScopeFactory.CreateScope();
         var handler = (INotificationHandler<T>)scope.ServiceProvider.GetRequiredService(handlerType);

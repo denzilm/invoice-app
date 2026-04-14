@@ -1,1 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="Aspire.RabbitMQ.Client" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\FrontendMentor.InvoiceApp.Shared\FrontendMentor.InvoiceApp.Shared.csproj" />
+  </ItemGroup>
+</Project>

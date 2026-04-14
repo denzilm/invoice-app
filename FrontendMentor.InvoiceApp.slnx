@@ -7,6 +7,8 @@
     <Project Path="Shared/src/Infrastructure/FrontendMentor.InvoiceApp.Messaging/FrontendMentor.InvoiceApp.Messaging.csproj" />
   </Folder>
   <Folder Name="/Shared/tests/">
+    <Project Path="Shared/tests/FrontendMentor.InvoiceApp.Messaging.IntegrationTests/FrontendMentor.InvoiceApp.Messaging.IntegrationTests.csproj" />
+    <Project Path="Shared/tests/FrontendMentor.InvoiceApp.Messaging.Tests/FrontendMentor.InvoiceApp.Messaging.Tests.csproj" />
     <Project Path="Shared/tests/FrontendMentor.InvoiceApp.Shared.Tests/FrontendMentor.InvoiceApp.Shared.Tests.csproj" />
   </Folder>
 </Solution>
