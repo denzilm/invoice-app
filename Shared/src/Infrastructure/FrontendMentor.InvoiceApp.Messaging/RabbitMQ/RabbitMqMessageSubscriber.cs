@@ -7,6 +7,8 @@ namespace FrontendMentor.InvoiceApp.Messaging.RabbitMQ;
 
 public sealed class RabbitMqMessageSubscriber : IHostedService
 {
+    private readonly List<IMessageHandler> _handlers = [];
+
     private readonly RabbitMqConnectionProvider _connectionProvider;
     private readonly IMessageBus _messageBus;
     private readonly IMessageRegistry _messageRegistry;
@@ -65,11 +67,14 @@ public sealed class RabbitMqMessageSubscriber : IHostedService
 
             var handler = await _messageBus.CreateListenerAsync(consumerName, cancellationToken);
             await handler.StartAsync(descriptor, cancellationToken);
+            _handlers.Add(handler);
         }
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
+    public async Task StopAsync(CancellationToken cancellationToken)
     {
-        return Task.CompletedTask;
+        // Dispose each handler
+        foreach (var handler in _handlers)
+            await handler.DisposeAsync();
     }
 }

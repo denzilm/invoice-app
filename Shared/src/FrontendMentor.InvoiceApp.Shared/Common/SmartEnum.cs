@@ -91,7 +91,7 @@ public abstract class SmartEnum<T> : IEquatable<T> where T : SmartEnum<T>
     /// Attempts to get the SmartEnum instance with the specified name
     /// </summary>
     /// <param name="name">The name to search for</param>
-    /// <param name="result">When this match returns, contains the matching instance if foundl otherwise null</param>
+    /// <param name="result">When this match returns, contains the matching instance if found otherwise null</param>
     /// <returns>true if a matching instance was found; otherwise false</returns>
     public static bool TryGetFromName(string name, out T? result)
     {

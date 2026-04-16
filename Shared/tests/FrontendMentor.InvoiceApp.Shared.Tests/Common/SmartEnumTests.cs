@@ -155,7 +155,7 @@ public sealed class SmartEnumTests
 internal sealed class TestStatus : SmartEnum<TestStatus>
 {
     public static readonly TestStatus Active = new(1, "Active", "Active Display");
-    public static readonly TestStatus Inactive = new(1, "Inactive", "Inactive Display");
+    public static readonly TestStatus Inactive = new(2, "Inactive", "Inactive Display");
     public TestStatus(int value, string name, string displayName)
         : base(value, name, displayName) { }
 

@@ -20,6 +20,8 @@ public sealed class RabbitMqMessageHandler : IMessageHandler
     private Channel<BasicDeliverEventArgs> _pipe = null!;
     private IReadOnlyList<Task> _workers = [];
 
+    private string _consumerTag = null!;
+
     private readonly ILogger<RabbitMqMessageHandler> _logger;
     private readonly IChannel _channel;
     private readonly IServiceProvider _serviceProvider;
@@ -27,6 +29,7 @@ public sealed class RabbitMqMessageHandler : IMessageHandler
     private readonly IMessageTopology _messageTopology;
     private readonly string _consumer;
     private readonly int _maxConcurrency;
+    private readonly CancellationTokenSource _drainCts = new();
 
     public RabbitMqMessageHandler(
         ILogger<RabbitMqMessageHandler> logger,
@@ -60,22 +63,26 @@ public sealed class RabbitMqMessageHandler : IMessageHandler
 
         _workers = Enumerable
             .Range(0, _maxConcurrency)
-            .Select(_ => Task.Run(() => ProcessLoopAsync(descriptor, cancellationToken), cancellationToken))
+            .Select(_ => Task.Run(() => ProcessLoopAsync(descriptor, cancellationToken), CancellationToken.None))
             .ToList();
 
         var consumer = new AsyncEventingBasicConsumer(_channel);
         consumer.ReceivedAsync += async (_, eventArgs) =>
         {
-            await _pipe.Writer.WriteAsync(eventArgs, cancellationToken);
+            // CancellationToken.None - we control shutdown via BasicCancelAsync
+            // not by abandoning mid-write
+            await _pipe.Writer.WriteAsync(eventArgs, CancellationToken.None);
         };
 
         await _channel.BasicQosAsync(0, (ushort)_maxConcurrency, false, cancellationToken);
-        await _channel.BasicConsumeAsync(queue: queueName, autoAck: false, consumer, cancellationToken);
+
+        // Store tag so we can cancel the consumer on shutdown
+        _consumerTag = await _channel.BasicConsumeAsync(queue: queueName, autoAck: false, consumer, cancellationToken);
     }
 
     private async Task ProcessLoopAsync(MessageDescriptor descriptor, CancellationToken cancellationToken)
     {
-        await foreach (var eventArgs in _pipe.Reader.ReadAllAsync(cancellationToken))
+        await foreach (var eventArgs in _pipe.Reader.ReadAllAsync(_drainCts.Token))
         {
             var version = GetHeaderValue(eventArgs.BasicProperties.Headers, "x-message-version", defaultValue: 1);
             var type = _messageRegistry.Resolve(descriptor.Name, version);
@@ -83,7 +90,7 @@ public sealed class RabbitMqMessageHandler : IMessageHandler
             {
                 var message = JsonSerializer.Deserialize(eventArgs.Body.ToArray(), type) as IMessage;
                 await HandleMessageAsync(message, type, cancellationToken);
-                await _channel.BasicAckAsync(eventArgs.DeliveryTag, multiple: false, cancellationToken);
+                await _channel.BasicAckAsync(eventArgs.DeliveryTag, multiple: false, CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -93,12 +100,12 @@ public sealed class RabbitMqMessageHandler : IMessageHandler
                 var retryCount = GetHeaderValue(eventArgs.BasicProperties.Headers, "x-delivery-attempt", defaultValue: 0);
                 if (retryCount < _messageTopology.MaxDeliveryCount)
                 {
-                    await RepublishWithDelay(eventArgs, descriptor, retryCount + 1, cancellationToken);
-                    await _channel.BasicAckAsync(eventArgs.DeliveryTag, false, cancellationToken);
+                    await RepublishWithDelay(eventArgs, descriptor, retryCount + 1, CancellationToken.None);
+                    await _channel.BasicAckAsync(eventArgs.DeliveryTag, false, CancellationToken.None);
                 }
                 else
                 {
-                    await _channel.BasicRejectAsync(eventArgs.DeliveryTag, false, cancellationToken);
+                    await _channel.BasicRejectAsync(eventArgs.DeliveryTag, false, CancellationToken.None);
                     _logger.LogError(
                         "Message processing failed after {Attempts} attempts. Sending to dead-letter queue",
                         retryCount);
@@ -168,17 +175,26 @@ public sealed class RabbitMqMessageHandler : IMessageHandler
         {
             byte[] bytes when int.TryParse(Encoding.UTF8.GetString(bytes), out var parsed) => parsed,
             int i => i,
-            long i and <= int.MaxValue and >= int.MaxValue => (int)i,
+            long l and >= int.MinValue and <= int.MaxValue => (int)l,
             _ => defaultValue
         };
     }
 
     public async ValueTask DisposeAsync()
     {
+        // Tell the broker to stop pushing new messages
+        await _channel.BasicCancelAsync(_consumerTag);
+
+        // Stop the RabbitMQ consumer pushing new messages into the pipe
         _pipe.Writer.Complete();
 
+        // Give workers time to drain what's already in the channel
         if (_workers.Count > 0)
             await Task.WhenAll(_workers);
+
+        // Now signal the drain token - workers have already exited ReadAllAsync naturally
+        await _drainCts.CancelAsync();
+        _drainCts.Dispose();
 
         await _channel.DisposeAsync();
     }
