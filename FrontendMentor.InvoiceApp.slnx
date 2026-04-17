@@ -1,4 +1,12 @@
 <Solution>
+  <Folder Name="/Aspire/" />
+  <Folder Name="/Identity/" />
+  <Folder Name="/Identity/src/">
+    <Project Path="Identity/src/FrontendMentor.InvoiceApp.Identity.Domain/FrontendMentor.InvoiceApp.Identity.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Identity/tests/">
+    <Project Path="Identity/tests/FrontendMentor.InvoiceApp.Identity.Domain.Tests/FrontendMentor.InvoiceApp.Identity.Domain.Tests.csproj" />
+  </Folder>
   <Folder Name="/Shared/" />
   <Folder Name="/Shared/src/">
     <Project Path="Shared/src/FrontendMentor.InvoiceApp.Shared/FrontendMentor.InvoiceApp.Shared.csproj" />

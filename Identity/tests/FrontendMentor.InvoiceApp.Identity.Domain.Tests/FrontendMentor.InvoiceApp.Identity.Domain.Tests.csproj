@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\src\FrontendMentor.InvoiceApp.Shared\FrontendMentor.InvoiceApp.Shared.csproj" />
+    <ProjectReference Include="..\..\src\FrontendMentor.InvoiceApp.Identity.Domain\FrontendMentor.InvoiceApp.Identity.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

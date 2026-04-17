@@ -1,0 +1,5 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\src\FrontendMentor.InvoiceApp.Shared\FrontendMentor.InvoiceApp.Shared.csproj" />
+  </ItemGroup>
+</Project>
