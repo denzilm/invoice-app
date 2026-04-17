@@ -3,6 +3,10 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App"/>
   </ItemGroup>
   <ItemGroup>
+    <InternalsVisibleTo  Include="FrontendMentor.InvoiceApp.Shared.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="libphonenumber-csharp" />
     <PackageReference Include="Polly.Core" />
     <PackageReference Include="Scrutor" />
   </ItemGroup>

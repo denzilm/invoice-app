@@ -46,7 +46,10 @@ public sealed partial record EmailAddress
 
         var atIndex = trimmed.IndexOf('@');
         if (atIndex > 64)
-            throw new ArgumentException("Email local part cannot exceed 64 characters", nameof(emailAddress));
+        {
+            error = "Email local part cannot exceed 64 characters";
+            return false;
+        }
 
         try
         {
@@ -55,7 +58,8 @@ public sealed partial record EmailAddress
         }
         catch (RegexMatchTimeoutException)
         {
-            throw new ArgumentException("Email address validation timed out", nameof(emailAddress));
+            error = "Email address validation timed out";
+            return false;
         }
 
         result = new EmailAddress(trimmed);
