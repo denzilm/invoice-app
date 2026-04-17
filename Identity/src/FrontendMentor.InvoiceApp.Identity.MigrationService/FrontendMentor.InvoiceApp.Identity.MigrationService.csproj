@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+  <ItemGroup>
+    <PackageReference Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Aspire\FrontendMentor.InvoiceApp.AspireUtilities\FrontendMentor.InvoiceApp.AspireUtilities.csproj" />
+    <ProjectReference Include="..\..\..\Aspire\FrontendMentor.InvoiceApp.ServiceDefaults\FrontendMentor.InvoiceApp.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\FrontendMentor.InvoiceApp.Identity.Infrastructure\FrontendMentor.InvoiceApp.Identity.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>
