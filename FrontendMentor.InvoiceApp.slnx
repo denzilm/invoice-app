@@ -1,5 +1,9 @@
 <Solution>
-  <Folder Name="/Aspire/" />
+  <Folder Name="/Aspire/">
+    <Project Path="Aspire/FrontendMentor.InvoiceApp.AppHost/FrontendMentor.InvoiceApp.AppHost.csproj" />
+    <Project Path="Aspire/FrontendMentor.InvoiceApp.AspireUtilities/FrontendMentor.InvoiceApp.AspireUtilities.csproj" />
+    <Project Path="Aspire/FrontendMentor.InvoiceApp.ServiceDefaults/FrontendMentor.InvoiceApp.ServiceDefaults.csproj" />
+  </Folder>
   <Folder Name="/Identity/" />
   <Folder Name="/Identity/src/">
     <Project Path="Identity/src/FrontendMentor.InvoiceApp.Identity.Domain/FrontendMentor.InvoiceApp.Identity.Domain.csproj" />

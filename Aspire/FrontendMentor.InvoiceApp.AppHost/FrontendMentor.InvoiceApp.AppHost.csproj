@@ -1,0 +1,6 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.2.2">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <UserSecretsId>888f8594-d126-4858-9771-d366b0350777</UserSecretsId>
+  </PropertyGroup>
+</Project>
