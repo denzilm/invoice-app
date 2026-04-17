@@ -3,6 +3,7 @@
   <Folder Name="/Identity/" />
   <Folder Name="/Identity/src/">
     <Project Path="Identity/src/FrontendMentor.InvoiceApp.Identity.Domain/FrontendMentor.InvoiceApp.Identity.Domain.csproj" />
+    <Project Path="Identity/src/FrontendMentor.InvoiceApp.Identity.Infrastructure/FrontendMentor.InvoiceApp.Identity.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Identity/tests/">
     <Project Path="Identity/tests/FrontendMentor.InvoiceApp.Identity.Domain.Tests/FrontendMentor.InvoiceApp.Identity.Domain.Tests.csproj" />
