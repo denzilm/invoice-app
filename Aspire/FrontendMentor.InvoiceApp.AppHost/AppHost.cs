@@ -9,10 +9,25 @@ var sqlServer = builder.AddSqlServer("sql", sqlAdminPassword)
 
 var authDb = sqlServer.AddDatabase(Databases.AuthDb);
 
-builder.AddProject<Projects.IdentityMigrator>(Migrators.IdentityMigrator)
+var redisPassword = builder.AddParameter("RedisPassword", secret: true);
+var cache = builder.AddRedis(Caches.AppCache, password: redisPassword)
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithDataVolume("redis_data")
+    .WithRedisInsight()
+    .WithPersistence(interval: TimeSpan.FromMinutes(5), keysChangedThreshold: 100);
+
+var identityMigrator = builder.AddProject<Projects.IdentityMigrator>(Migrators.IdentityMigrator)
     .WithReference(authDb)
     .WaitFor(authDb)
     .WithParentRelationship(sqlServer)
     .ExcludeFromManifest();
+
+builder.AddProject<Projects.IdentityApi>(Apis.IdentityApi)
+    .WithReference(authDb)
+    .WithReference(identityMigrator)
+    .WithReference(cache)
+    .WaitFor(identityMigrator)
+    .WaitFor(cache);
+
 
 builder.Build().Run();
