@@ -6,6 +6,7 @@
   </Folder>
   <Folder Name="/Identity/" />
   <Folder Name="/Identity/src/">
+    <Project Path="Identity/src/FrontendMentor.InvoiceApp.Identity.Api/FrontendMentor.InvoiceApp.Identity.Api.csproj" />
     <Project Path="Identity/src/FrontendMentor.InvoiceApp.Identity.Domain/FrontendMentor.InvoiceApp.Identity.Domain.csproj" />
     <Project Path="Identity/src/FrontendMentor.InvoiceApp.Identity.Infrastructure/FrontendMentor.InvoiceApp.Identity.Infrastructure.csproj" />
     <Project Path="Identity/src/FrontendMentor.InvoiceApp.Identity.MigrationService/FrontendMentor.InvoiceApp.Identity.MigrationService.csproj" />

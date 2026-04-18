@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Aspire\FrontendMentor.InvoiceApp.AspireUtilities\FrontendMentor.InvoiceApp.AspireUtilities.csproj" />
+    <ProjectReference Include="..\..\..\Aspire\FrontendMentor.InvoiceApp.ServiceDefaults\FrontendMentor.InvoiceApp.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\FrontendMentor.InvoiceApp.Identity.Infrastructure\FrontendMentor.InvoiceApp.Identity.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" />
+  </ItemGroup>
+</Project>
