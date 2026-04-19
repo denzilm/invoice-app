@@ -15,7 +15,7 @@ env:
   BUILD_CONFIGURATION: Release
 jobs:
   build:
-    name: PR Verify
+    name: Build Identity
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
