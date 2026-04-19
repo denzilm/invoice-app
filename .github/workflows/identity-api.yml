@@ -8,6 +8,8 @@ on:
     paths:
       - Identity/**
       - Shared/**
+permissions:
+  contents: read
 env:
   DOTNET_VERSION: 10.x
   BUILD_CONFIGURATION: Release
