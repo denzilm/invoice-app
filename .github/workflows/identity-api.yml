@@ -1,0 +1,37 @@
+﻿name: Identity API
+
+on:
+  push:
+    branches:
+      - main
+      - release/*
+    paths:
+      - Identity/**
+      - Shared/**
+env:
+  DOTNET_VERSION: 10.x
+  BUILD_CONFIGURATION: Release
+jobs:
+  build:
+    name: PR Verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration ${{ env.BUILD_CONFIGURATION }}
+
+      - name: Test
+        run: dotnet test --configuration ${{ env.BUILD_CONFIGURATION }} --no-build --verbosity normal
+
+      - name: Publish
+        run: dotnet publish Identity/src/FrontendMentor.InvoiceApp.Identity.Api --configuration ${{ env.BUILD_CONFIGURATION }} --no-build --output artifacts
