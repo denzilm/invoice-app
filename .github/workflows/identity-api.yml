@@ -37,3 +37,9 @@ jobs:
 
       - name: Publish
         run: dotnet publish Identity/src/FrontendMentor.InvoiceApp.Identity.Api --configuration ${{ env.BUILD_CONFIGURATION }} --no-build --output artifacts
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: identity-api
+          path: artifacts
