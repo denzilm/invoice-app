@@ -10,11 +10,11 @@ public static class ServiceCollectionExtensions
     {
         services.AddIdentityCore<ApplicationUser>(options =>
         {
-            options.Lockout.AllowedForNewUsers  = true;
+            options.Lockout.AllowedForNewUsers = true;
             options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
             options.Lockout.MaxFailedAccessAttempts = 10;
             options.Password.RequireDigit = true;
-            options.Password.RequireLowercase  = true;
+            options.Password.RequireLowercase = true;
             options.Password.RequireNonAlphanumeric = true;
             options.Password.RequireUppercase = true;
             options.Password.RequiredLength = 8;

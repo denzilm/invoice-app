@@ -50,7 +50,7 @@ public abstract class SmartEnum<T> : IEquatable<T> where T : SmartEnum<T>
     /// <exception cref="ArgumentException">Thrown when no matching instance is found</exception>
     public static T FromValue(int value)
     {
-        var matchingItem  = Enumerate().FirstOrDefault(item => item.Value == value);
+        var matchingItem = Enumerate().FirstOrDefault(item => item.Value == value);
         if (matchingItem is null)
             throw new ArgumentException($"Value '{value}' is not a valid value for '{typeof(T).Name}'", nameof(value));
 
@@ -121,5 +121,5 @@ public abstract class SmartEnum<T> : IEquatable<T> where T : SmartEnum<T>
 
     public static bool operator !=(SmartEnum<T>? left, SmartEnum<T>? right) => !(left == right);
 
-    public override string ToString() =>  DisplayName;
+    public override string ToString() => DisplayName;
 }

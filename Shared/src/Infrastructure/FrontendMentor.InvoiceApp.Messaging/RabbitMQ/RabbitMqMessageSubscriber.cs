@@ -51,7 +51,7 @@ public sealed class RabbitMqMessageSubscriber : IHostedService
                 {
                     ["x-dead-letter-exchange"] = string.Empty,
                     ["x-dead-letter-routing-key"] = deadLetterQueueName,
-                },cancellationToken: cancellationToken);
+                }, cancellationToken: cancellationToken);
             await channel.QueueBindAsync(queueName, exchangeName, string.Empty, cancellationToken: cancellationToken);
 
             await channel.QueueDeclareAsync(

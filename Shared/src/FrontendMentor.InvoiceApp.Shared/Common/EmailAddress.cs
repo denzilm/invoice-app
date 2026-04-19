@@ -67,7 +67,7 @@ public sealed partial record EmailAddress
         return true;
     }
 
-    public override string ToString()  => Value;
+    public override string ToString() => Value;
 
     public static implicit operator string(EmailAddress emailAddress) => emailAddress.Value;
 }

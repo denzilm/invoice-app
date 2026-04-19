@@ -9,7 +9,7 @@ public sealed record PhoneNumber
     private PhoneNumber(string number, string? countryCode)
     {
         Number = number;
-        CountryCode =  countryCode;
+        CountryCode = countryCode;
     }
 
     /// <summary>

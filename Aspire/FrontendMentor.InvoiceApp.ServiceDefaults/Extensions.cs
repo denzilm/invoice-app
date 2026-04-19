@@ -8,6 +8,7 @@ using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
+// ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.Hosting;
 
 public static class Extensions
@@ -34,7 +35,6 @@ public static class Extensions
                 http.AddServiceDiscovery();
             });
 
-
             builder.Services.Configure<ServiceDiscoveryOptions>(options =>
             {
                 options.AllowedSchemes = ["https"];
@@ -43,7 +43,7 @@ public static class Extensions
             return builder;
         }
 
-        private TBuilder ConfigureOpenTelemetry()
+        private void ConfigureOpenTelemetry()
         {
             builder.Logging.AddOpenTelemetry(logging =>
             {
@@ -61,9 +61,9 @@ public static class Extensions
                 .WithTracing(tracing =>
                 {
                     tracing.AddSource(builder.Environment.ApplicationName)
-                        .AddAspNetCoreInstrumentation(tracing =>
+                        .AddAspNetCoreInstrumentation(builder =>
                             // Exclude health check requests from tracing
-                            tracing.Filter = context =>
+                            builder.Filter = context =>
                                 !context.Request.Path.StartsWithSegments(HealthEndpointPath)
                                 && !context.Request.Path.StartsWithSegments(AlivenessEndpointPath)
                         )
@@ -71,11 +71,9 @@ public static class Extensions
                 });
 
             builder.AddOpenTelemetryExporters();
-
-            return builder;
         }
 
-        private TBuilder AddOpenTelemetryExporters()
+        private void AddOpenTelemetryExporters()
         {
             var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
 
@@ -83,8 +81,6 @@ public static class Extensions
             {
                 builder.Services.AddOpenTelemetry().UseOtlpExporter();
             }
-
-            return builder;
         }
 
         public TBuilder AddDefaultHealthChecks()

@@ -33,7 +33,7 @@ public sealed class PhoneNumberTests
     [InlineData("   ")]
     public void Create_Empty_ThrowsWithCorrectParamName(string? input)
     {
-        var ex =  Assert.Throws<ArgumentException>(() => PhoneNumber.Create(input!));
+        var ex = Assert.Throws<ArgumentException>(() => PhoneNumber.Create(input!));
 
         Assert.Equal("phoneNumber", ex.ParamName);
         Assert.Contains("null or empty", ex.Message);
@@ -118,7 +118,7 @@ public sealed class PhoneNumberTests
     public void WithExpression_ProducesNewInstanceWithUpdatedValue()
     {
         var original = PhoneNumber.Create("+12025551234");
-        var modified  = original with { CountryCode = "CA" };
+        var modified = original with { CountryCode = "CA" };
 
         Assert.Equal("+12025551234", modified.Number);
         Assert.Equal("CA", modified.CountryCode);
