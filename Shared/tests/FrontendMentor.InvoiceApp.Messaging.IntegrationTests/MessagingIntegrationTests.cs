@@ -85,7 +85,7 @@ public sealed class MessagingIntegrationTests
 
         var (publisher, _, _) = await SetupAsync();
 
-        var publishingTasks  = Enumerable.Range(0, maxConcurrentCalls)
+        var publishingTasks = Enumerable.Range(0, maxConcurrentCalls)
             .Select(_ => publisher.PublishAsync(new ConcurrentTestMessage()));
 
         await Task.WhenAll(publishingTasks);
@@ -103,8 +103,8 @@ public sealed class MessagingIntegrationTests
 
         var (publisher, _, _) = await SetupAsync();
 
-        await publisher.PublishAsync(new  TestMessageV1 { Content = "v1" });
-        await publisher.PublishAsync(new  TestMessageV2 { Content = "v2", Extra = "extra" });
+        await publisher.PublishAsync(new TestMessageV1 { Content = "v1" });
+        await publisher.PublishAsync(new TestMessageV2 { Content = "v2", Extra = "extra" });
 
         var v1 = await V1TestHandler.Tcs.Task.WaitAsync(TimeSpan.FromSeconds(10));
         var v2 = await V2TestHandler.Tcs.Task.WaitAsync(TimeSpan.FromSeconds(10));
@@ -115,60 +115,60 @@ public sealed class MessagingIntegrationTests
     }
 
     [Fact]
-public async Task Should_Invoke_All_Handlers_For_Message()
-{
-    MultiHandlerA.Tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-    MultiHandlerB.Tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+    public async Task Should_Invoke_All_Handlers_For_Message()
+    {
+        MultiHandlerA.Tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        MultiHandlerB.Tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-    var (publisher, _, _) = await SetupAsync();
+        var (publisher, _, _) = await SetupAsync();
 
-    await publisher.PublishAsync(new MultiHandlerTestMessage());
+        await publisher.PublishAsync(new MultiHandlerTestMessage());
 
-    await Task.WhenAll(
-        MultiHandlerA.Tcs.Task.WaitAsync(TimeSpan.FromMinutes(1)),
-        MultiHandlerB.Tcs.Task.WaitAsync(TimeSpan.FromMinutes(1)));
-}
+        await Task.WhenAll(
+            MultiHandlerA.Tcs.Task.WaitAsync(TimeSpan.FromMinutes(1)),
+            MultiHandlerB.Tcs.Task.WaitAsync(TimeSpan.FromMinutes(1)));
+    }
 
-[Fact]
-public async Task Publisher_Dispose_Should_Not_Affect_Consumer()
-{
-    TestHandler.Tcs = new TaskCompletionSource<TestMessage>(TaskCreationOptions.RunContinuationsAsynchronously);
+    [Fact]
+    public async Task Publisher_Dispose_Should_Not_Affect_Consumer()
+    {
+        TestHandler.Tcs = new TaskCompletionSource<TestMessage>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-    var (publisher, _, _) = await SetupAsync();
+        var (publisher, _, _) = await SetupAsync();
 
-    await publisher.PublishAsync(new TestMessage { Content = "after dispose" });
-    await publisher.DisposeAsync(); // dispose before message is consumed
+        await publisher.PublishAsync(new TestMessage { Content = "after dispose" });
+        await publisher.DisposeAsync(); // dispose before message is consumed
 
-    var message = await TestHandler.Tcs.Task.WaitAsync(TimeSpan.FromMinutes(1));
+        var message = await TestHandler.Tcs.Task.WaitAsync(TimeSpan.FromMinutes(1));
 
-    Assert.Equal("after dispose", message.Content);
-}
+        Assert.Equal("after dispose", message.Content);
+    }
 
-[Fact]
-public async Task Should_Complete_Inflight_Messages_Before_Shutdown()
-{
-    ShutdownTestHandler.Started = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-    ShutdownTestHandler.Completed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+    [Fact]
+    public async Task Should_Complete_Inflight_Messages_Before_Shutdown()
+    {
+        ShutdownTestHandler.Started = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        ShutdownTestHandler.Completed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-    var (publisher, provider, _) = await SetupAsync();
-    var hostedServices = provider.GetServices<IHostedService>().ToList();
+        var (publisher, provider, _) = await SetupAsync();
+        var hostedServices = provider.GetServices<IHostedService>().ToList();
 
-    await publisher.PublishAsync(new ShutdownTestMessage());
+        await publisher.PublishAsync(new ShutdownTestMessage());
 
-    // Wait until the handler has started (i.e., is inflight)
-    await ShutdownTestHandler.Started.Task.WaitAsync(TimeSpan.FromSeconds(10));
+        // Wait until the handler has started (i.e., is inflight)
+        await ShutdownTestHandler.Started.Task.WaitAsync(TimeSpan.FromSeconds(10));
 
-    // Stop host while handler is still running
-    var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-    foreach (var svc in hostedServices)
-        await svc.StopAsync(cts.Token);
+        // Stop host while handler is still running
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        foreach (var svc in hostedServices)
+            await svc.StopAsync(cts.Token);
 
-    // Handler should have completed despite shutdown
-    var completed = await ShutdownTestHandler.Completed.Task
-        .WaitAsync(TimeSpan.FromSeconds(5), cts.Token);
+        // Handler should have completed despite shutdown
+        var completed = await ShutdownTestHandler.Completed.Task
+            .WaitAsync(TimeSpan.FromSeconds(5), cts.Token);
 
-    Assert.True(completed);
-}
+        Assert.True(completed);
+    }
 
     private async Task<(IMessagePublisher, ServiceProvider provider, IMessageTopology topology)> SetupAsync()
     {

@@ -4,7 +4,7 @@ namespace FrontendMentor.InvoiceApp.Messaging.IntegrationTests;
 
 public sealed class RabbitMqFixture : IAsyncLifetime
 {
-    private readonly RabbitMqContainer  _container = new RabbitMqBuilder("rabbitmq:3.11")
+    private readonly RabbitMqContainer _container = new RabbitMqBuilder("rabbitmq:3.11")
         .Build();
 
     public string ConnectionString => _container.GetConnectionString();

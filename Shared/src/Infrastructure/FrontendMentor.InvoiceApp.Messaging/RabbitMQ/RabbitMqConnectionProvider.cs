@@ -4,7 +4,7 @@ namespace FrontendMentor.InvoiceApp.Messaging.RabbitMQ;
 
 public sealed class RabbitMqConnectionProvider : IAsyncDisposable
 {
-    private readonly Lazy<Task<IConnection>>  _connection;
+    private readonly Lazy<Task<IConnection>> _connection;
 
     public RabbitMqConnectionProvider(string connectionString)
     {
@@ -25,5 +25,5 @@ public sealed class RabbitMqConnectionProvider : IAsyncDisposable
         return await factory.CreateConnectionAsync();
     }
 
-    public async ValueTask DisposeAsync() =>  (await _connection.Value).Dispose();
+    public async ValueTask DisposeAsync() => (await _connection.Value).Dispose();
 }

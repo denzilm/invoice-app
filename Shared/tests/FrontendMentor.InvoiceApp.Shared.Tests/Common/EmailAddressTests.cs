@@ -144,7 +144,7 @@ public sealed class EmailAddressTests
     [Fact]
     public void TwoInstancesWithSameEmail_AreEqual()
     {
-        var first  = EmailAddress.Create("equal@example.com");
+        var first = EmailAddress.Create("equal@example.com");
         var second = EmailAddress.Create("equal@example.com");
 
         Assert.Equal(first, second);
@@ -153,7 +153,7 @@ public sealed class EmailAddressTests
     [Fact]
     public void TwoInstancesWithDifferentEmails_AreNotEqual()
     {
-        var first  = EmailAddress.Create("one@example.com");
+        var first = EmailAddress.Create("one@example.com");
         var second = EmailAddress.Create("two@example.com");
 
         Assert.NotEqual(first, second);
@@ -162,7 +162,7 @@ public sealed class EmailAddressTests
     [Fact]
     public void TwoEqualInstances_HaveSameHashCode()
     {
-        var first  = EmailAddress.Create("hash@example.com");
+        var first = EmailAddress.Create("hash@example.com");
         var second = EmailAddress.Create("hash@example.com");
 
         Assert.Equal(first.GetHashCode(), second.GetHashCode());

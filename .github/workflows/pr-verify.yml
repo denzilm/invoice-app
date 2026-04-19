@@ -28,3 +28,6 @@ jobs:
 
       - name: Test
         run: dotnet test --configuration ${{ env.BUILD_CONFIGURATION }} --no-build --verbosity normal
+
+      - name: Formatting
+        run: dotnet format -v detailed --verify-no-changes

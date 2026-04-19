@@ -29,5 +29,4 @@ builder.AddProject<Projects.IdentityApi>(Apis.IdentityApi)
     .WaitFor(identityMigrator)
     .WaitFor(cache);
 
-
 builder.Build().Run();

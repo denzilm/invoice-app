@@ -8,8 +8,8 @@ public sealed class RabbitMqMessageBus : IMessageBus
 {
     private readonly RabbitMqConnectionProvider _connectionProvider;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IMessageTopology  _messageTopology;
-    private readonly IMessageRegistry  _messageRegistry;
+    private readonly IMessageTopology _messageTopology;
+    private readonly IMessageRegistry _messageRegistry;
     private readonly int _maxConcurrentCalls;
 
     public RabbitMqMessageBus(
@@ -39,7 +39,7 @@ public sealed class RabbitMqMessageBus : IMessageBus
     {
         var connection = await _connectionProvider.GetConnectionAsync();
         var channel = await connection.CreateChannelAsync(cancellationToken: cancellationToken);
-        var logger  = _serviceProvider.GetRequiredService<ILogger<RabbitMqMessageHandler>>();
+        var logger = _serviceProvider.GetRequiredService<ILogger<RabbitMqMessageHandler>>();
 
         return new RabbitMqMessageHandler(
             logger, consumer, channel, _serviceProvider, _messageRegistry, _messageTopology, _maxConcurrentCalls);

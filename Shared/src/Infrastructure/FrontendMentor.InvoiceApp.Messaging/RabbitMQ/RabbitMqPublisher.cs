@@ -7,7 +7,7 @@ namespace FrontendMentor.InvoiceApp.Messaging.RabbitMQ;
 
 public sealed class RabbitMqPublisher : IMessagePublisher
 {
-    private readonly ILogger<RabbitMqPublisher>  _logger;
+    private readonly ILogger<RabbitMqPublisher> _logger;
     private readonly IChannel _channel;
 
     public RabbitMqPublisher(ILogger<RabbitMqPublisher> logger, IChannel channel)

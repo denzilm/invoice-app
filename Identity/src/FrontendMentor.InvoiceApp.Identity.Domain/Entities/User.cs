@@ -8,10 +8,10 @@ public sealed class User : EntityBase<Guid>
     private User(Guid id, string firstName, string lastName, EmailAddress emailAddress, PhoneNumber phoneNumber, string avatarUrl)
         : base(id)
     {
-        FirstName =  firstName;
+        FirstName = firstName;
         LastName = lastName;
         EmailAddress = emailAddress;
-        PhoneNumber =  phoneNumber;
+        PhoneNumber = phoneNumber;
         AvatarUrl = avatarUrl;
     }
 

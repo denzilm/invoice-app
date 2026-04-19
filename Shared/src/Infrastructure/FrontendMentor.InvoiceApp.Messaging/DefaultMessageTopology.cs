@@ -10,9 +10,9 @@ internal class DefaultMessageTopology : IMessageTopology
 
     public string GetQueueName(string messageName, string consumer) => $"{messageName}.{consumer}";
 
-    public string GetRetryQueueName(string messageName, string consumer)  => $"{messageName}.{consumer}.retry";
+    public string GetRetryQueueName(string messageName, string consumer) => $"{messageName}.{consumer}.retry";
 
-    public string GetDeadLetterQueueName(string messageName, string consumer)   => $"{messageName}.{consumer}.dlq";
+    public string GetDeadLetterQueueName(string messageName, string consumer) => $"{messageName}.{consumer}.dlq";
 
     public TimeSpan GetRetryDelay(int attempt)
     {
