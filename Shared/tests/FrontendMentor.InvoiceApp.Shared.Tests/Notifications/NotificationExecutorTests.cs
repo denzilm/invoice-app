@@ -58,6 +58,7 @@ public sealed class NotificationExecutorTests
 
         var executor = CreateExecutor(scopeFactory, registry);
 
+        // ReSharper disable once RedundantArgumentDefaultValue
         await executor.ExecuteAsync(new TestNotification(), NotificationExecutionStrategy.Parallel);
 
         Assert.Equal(2, handler1.CallCount + handler2.CallCount);

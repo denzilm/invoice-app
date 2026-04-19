@@ -144,49 +144,49 @@ public class UserTests
     }
 
     [Fact]
-        public void Allows_Multiple_Distinct_Identities()
-        {
-            var user = CreateValidUser();
+    public void Allows_Multiple_Distinct_Identities()
+    {
+        var user = CreateValidUser();
 
-            user.LinkIdentity(MakeIdentity(LoginProviderEnum.Local, "g-123"));
-            user.LinkIdentity(MakeIdentity(LoginProviderEnum.Local, "gh-456"));
+        user.LinkIdentity(MakeIdentity(LoginProviderEnum.Local, "g-123"));
+        user.LinkIdentity(MakeIdentity(LoginProviderEnum.Local, "gh-456"));
 
-            Assert.Equal(2, user.UserIdentities.Count);
-        }
+        Assert.Equal(2, user.UserIdentities.Count);
+    }
 
-        [Fact]
-        public void Allows_Same_Provider_With_Different_Key()
-        {
-            var user = CreateValidUser();
+    [Fact]
+    public void Allows_Same_Provider_With_Different_Key()
+    {
+        var user = CreateValidUser();
 
-            user.LinkIdentity(MakeIdentity(LoginProviderEnum.Local, "key-1"));
-            user.LinkIdentity(MakeIdentity(LoginProviderEnum.Local, "key-2"));
+        user.LinkIdentity(MakeIdentity(LoginProviderEnum.Local, "key-1"));
+        user.LinkIdentity(MakeIdentity(LoginProviderEnum.Local, "key-2"));
 
-            Assert.Equal(2, user.UserIdentities.Count);
-        }
+        Assert.Equal(2, user.UserIdentities.Count);
+    }
 
-        [Fact]
-        public void Throws_When_Same_Provider_And_Key_Already_Linked()
-        {
-            var user = CreateValidUser();
-            user.LinkIdentity(MakeIdentity(LoginProviderEnum.Local, "abc123"));
+    [Fact]
+    public void Throws_When_Same_Provider_And_Key_Already_Linked()
+    {
+        var user = CreateValidUser();
+        user.LinkIdentity(MakeIdentity(LoginProviderEnum.Local, "abc123"));
 
-            var ex = Assert.Throws<InvalidOperationException>(
-                () => user.LinkIdentity(MakeIdentity(LoginProviderEnum.Local, "abc123")));
+        var ex = Assert.Throws<InvalidOperationException>(
+            () => user.LinkIdentity(MakeIdentity(LoginProviderEnum.Local, "abc123")));
 
-            Assert.Contains("already linked", ex.Message, StringComparison.OrdinalIgnoreCase);
-        }
+        Assert.Contains("already linked", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
 
-        [Fact]
-        public void UserIdentities_Cannot_Be_Mutated_Externally()
-        {
-            var user = CreateValidUser();
+    [Fact]
+    public void UserIdentities_Cannot_Be_Mutated_Externally()
+    {
+        var user = CreateValidUser();
 
-            var collection = user.UserIdentities;
+        var collection = user.UserIdentities;
 
-            Assert.IsType<IReadOnlyList<UserIdentity>>(collection, exactMatch: false);
-            Assert.False(collection is List<UserIdentity>, "Collection should not be the raw list");
-        }
+        Assert.IsType<IReadOnlyList<UserIdentity>>(collection, exactMatch: false);
+        Assert.False(collection is List<UserIdentity>, "Collection should not be the raw list");
+    }
 
     private static User CreateValidUser(string firstName = "Jane", string lastName = "Doe", string avatarUrl = ValidAvatarUrl) =>
         User.Create(firstName, lastName, Helpers.ValidEmail(), Helpers.ValidPhone(), avatarUrl);

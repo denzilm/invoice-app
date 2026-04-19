@@ -127,23 +127,23 @@ public sealed class RabbitMqMessageHandler : IMessageHandler
 
     private static Func<INotificationExecutor, IMessage, CancellationToken, Task> BuildDispatcher(Type messageType)
     {
-       var executorParam = Expression.Parameter(typeof(INotificationExecutor), "executor");
-       var messageParam = Expression.Parameter(typeof(IMessage), "message");
-       var ctParam = Expression.Parameter(typeof(CancellationToken), "ct");
+        var executorParam = Expression.Parameter(typeof(INotificationExecutor), "executor");
+        var messageParam = Expression.Parameter(typeof(IMessage), "message");
+        var ctParam = Expression.Parameter(typeof(CancellationToken), "ct");
 
-       var method = typeof(INotificationExecutor)
-           .GetMethod(nameof(INotificationExecutor.ExecuteAsync))!
-           .MakeGenericMethod(messageType);
+        var method = typeof(INotificationExecutor)
+            .GetMethod(nameof(INotificationExecutor.ExecuteAsync))!
+            .MakeGenericMethod(messageType);
 
-       var call =  Expression.Call(
-           executorParam,
-           method,
-           Expression.Convert(messageParam, messageType),
-           Expression.Constant(NotificationExecutionStrategy.Parallel), ctParam);
+        var call = Expression.Call(
+            executorParam,
+            method,
+            Expression.Convert(messageParam, messageType),
+            Expression.Constant(NotificationExecutionStrategy.Parallel), ctParam);
 
-       return Expression
-           .Lambda<Func<INotificationExecutor, IMessage, CancellationToken, Task>>(call, executorParam, messageParam, ctParam)
-           .Compile();
+        return Expression
+            .Lambda<Func<INotificationExecutor, IMessage, CancellationToken, Task>>(call, executorParam, messageParam, ctParam)
+            .Compile();
     }
 
     private async Task RepublishWithDelay(

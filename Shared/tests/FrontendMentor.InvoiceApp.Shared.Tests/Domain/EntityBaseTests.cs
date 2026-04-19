@@ -15,7 +15,7 @@ public sealed class EntityBaseTests
     [Fact]
     public void Equals_SameId_ReturnsTrue()
     {
-        var a =  new TestEntity("1");
+        var a = new TestEntity("1");
         var b = new TestEntity("1");
 
         Assert.True(a.Equals(b));
@@ -24,7 +24,7 @@ public sealed class EntityBaseTests
     [Fact]
     public void Equals_DifferentId_ReturnsFalse()
     {
-        var a =  new TestEntity("1");
+        var a = new TestEntity("1");
         var b = new TestEntity("1");
 
         Assert.True(a.Equals(b));
@@ -33,7 +33,7 @@ public sealed class EntityBaseTests
     [Fact]
     public void Equals_NullOther_ReturnsFalse()
     {
-        var a =  new TestEntity("1");
+        var a = new TestEntity("1");
 
         Assert.False(a.Equals(null));
     }
@@ -41,7 +41,7 @@ public sealed class EntityBaseTests
     [Fact]
     public void Equals_NullId_ReturnsFalse()
     {
-        var a =  new TestEntity(null!);
+        var a = new TestEntity(null!);
         var b = new TestEntity("1");
 
         Assert.False(a.Equals(b));
@@ -50,7 +50,7 @@ public sealed class EntityBaseTests
     [Fact]
     public void Equals_BothNullId_ReturnsFalse()
     {
-        var a =  new TestEntity(null!);
+        var a = new TestEntity(null!);
         var b = new TestEntity(null!);
 
         Assert.False(a.Equals(b));
@@ -76,6 +76,7 @@ public sealed class EntityBaseTests
     public void Equals_ObjectOverload_NonEntityType_ReturnsFalse()
     {
         var entity = new TestEntity("1");
+        // ReSharper disable once SuspiciousTypeConversion.Global
         Assert.False(entity.Equals("1"));
     }
 

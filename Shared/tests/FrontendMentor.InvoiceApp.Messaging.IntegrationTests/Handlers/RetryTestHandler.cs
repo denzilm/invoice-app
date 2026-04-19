@@ -5,7 +5,7 @@ namespace FrontendMentor.InvoiceApp.Messaging.IntegrationTests.Handlers;
 
 public sealed class RetryTestHandler : INotificationHandler<RetryMessage>
 {
-    private static int _attempts = 0; // static
+    private static int _attempts;
 
     public static readonly TaskCompletionSource<int> AttemptsTcs =
         new(TaskCreationOptions.RunContinuationsAsynchronously);
