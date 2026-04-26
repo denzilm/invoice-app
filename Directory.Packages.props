@@ -4,11 +4,13 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="Amazon.CDK.Lib" Version="2.250.0" />
     <PackageVersion Include="Aspire.Hosting.Redis" Version="13.2.2" />
     <PackageVersion Include="Aspire.Hosting.SqlServer" Version="13.2.2" />
     <PackageVersion Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="13.2.2" />
     <PackageVersion Include="Aspire.RabbitMQ.Client" Version="13.2.2" />
     <PackageVersion Include="Aspire.StackExchange.Redis" Version="13.2.2" />
+    <PackageVersion Include="Constructs" Version="10.6.0" />
     <PackageVersion Include="coverlet.collector" Version="8.0.1" />
     <PackageVersion Include="libphonenumber-csharp" Version="9.0.27" />
     <PackageVersion Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="10.0.6" />
