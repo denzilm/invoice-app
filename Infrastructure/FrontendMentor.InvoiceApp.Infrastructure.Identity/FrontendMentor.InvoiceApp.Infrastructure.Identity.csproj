@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Amazon.CDK.Lib" />
+    <PackageReference Include="Constructs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FrontendMentor.InvoiceApp.Infrastructure\FrontendMentor.InvoiceApp.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="cdk.out\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="cdk.out\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="cdk.out\**" />
+  </ItemGroup>
+
+</Project>

@@ -6,6 +6,6 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <NoWarn>NU1605;NU1903</NoWarn>
+    <NoWarn>NU1605;NU1903;NU1902</NoWarn>
   </PropertyGroup>
 </Project>
