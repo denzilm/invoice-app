@@ -4,12 +4,15 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="Amazon.AspNetCore.DataProtection.SSM" Version="4.0.3" />
     <PackageVersion Include="Amazon.CDK.Lib" Version="2.250.0" />
+    <PackageVersion Include="Aspire.Hosting.AWS" Version="13.0.0" />
     <PackageVersion Include="Aspire.Hosting.Redis" Version="13.2.2" />
     <PackageVersion Include="Aspire.Hosting.SqlServer" Version="13.2.2" />
     <PackageVersion Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="13.2.2" />
     <PackageVersion Include="Aspire.RabbitMQ.Client" Version="13.2.2" />
     <PackageVersion Include="Aspire.StackExchange.Redis" Version="13.2.2" />
+    <PackageVersion Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.34" />
     <PackageVersion Include="Constructs" Version="10.6.0" />
     <PackageVersion Include="coverlet.collector" Version="8.0.1" />
     <PackageVersion Include="libphonenumber-csharp" Version="9.0.27" />
@@ -30,6 +33,7 @@
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.2" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.15.2" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.15.1" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AWS" Version="1.15.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.15.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.0" />
     <PackageVersion Include="Polly.Core" Version="8.6.6" />

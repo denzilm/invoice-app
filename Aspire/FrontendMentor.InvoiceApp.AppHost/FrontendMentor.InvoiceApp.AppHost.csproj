@@ -10,6 +10,7 @@
     <ProjectReference Include="..\FrontendMentor.InvoiceApp.AspireUtilities\FrontendMentor.InvoiceApp.AspireUtilities.csproj" IsAspireProjectResource="false" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AWS" />
     <PackageReference Include="Aspire.Hosting.Redis" />
     <PackageReference Include="Aspire.Hosting.SqlServer" />
   </ItemGroup>
