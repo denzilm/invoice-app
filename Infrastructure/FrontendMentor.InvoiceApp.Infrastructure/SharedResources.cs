@@ -20,11 +20,11 @@ public sealed class SharedResources : Construct
 
         Cluster = Amazon.CDK.AWS.ECS.Cluster.FromClusterAttributes(
             this, $"invoice-app-cluster-{config.Environment}", new ClusterAttributes
-        {
-            Vpc = ApplicationVpc,
-            ClusterName = $"invoice-app-cluster-{config.Environment}",
-            ClusterArn = StringParameter.ValueForStringParameter(this, parameters.ClusterArn)
-        });
+            {
+                Vpc = ApplicationVpc,
+                ClusterName = $"invoice-app-cluster-{config.Environment}",
+                ClusterArn = StringParameter.ValueForStringParameter(this, parameters.ClusterArn)
+            });
 
         IdentityRepository = Repository.FromRepositoryName(
             this,
@@ -38,6 +38,6 @@ public sealed class SharedResources : Construct
 
     public IVpc ApplicationVpc { get; }
     public IRepository IdentityRepository { get; }
-    public ICluster  Cluster { get; }
+    public ICluster Cluster { get; }
     public IRole ExecutionRole { get; }
 }
