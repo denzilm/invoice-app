@@ -56,6 +56,7 @@ public static class Extensions
                 {
                     metrics.AddAspNetCoreInstrumentation()
                         .AddHttpClientInstrumentation()
+                        .AddAWSInstrumentation()
                         .AddRuntimeInstrumentation();
                 })
                 .WithTracing(tracing =>
@@ -67,6 +68,7 @@ public static class Extensions
                                 !context.Request.Path.StartsWithSegments(HealthEndpointPath)
                                 && !context.Request.Path.StartsWithSegments(AlivenessEndpointPath)
                         )
+                        .AddAWSInstrumentation()
                         .AddHttpClientInstrumentation();
                 });
 
