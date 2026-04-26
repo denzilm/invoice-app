@@ -357,3 +357,5 @@ MigrationBackup/
 
 # Windows reserved name artifact
 nul
+
+**/cdk.out
