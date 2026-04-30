@@ -10,7 +10,7 @@ namespace FrontendMentor.InvoiceApp.Infrastructure.Identity;
 
 public sealed class Storage : Construct
 {
-    public Storage(Construct scope, string id, AppConfig config, IVpc vpc)
+    public Storage(Construct scope, string id, AppConfig config, IVpc vpc, Parameters parameters)
         : base(scope, id)
     {
         var databaseSecurityGroup = new SecurityGroup(this, $"identity-database-security-group-{config.Environment}", new SecurityGroupProps
@@ -20,6 +20,17 @@ public sealed class Storage : Construct
             Description = "Security group for the identity database",
             AllowAllOutbound = true
         });
+
+        var migrationSecurityGroup = new SecurityGroup(
+            this, $"identity-database-migration-security-group-{config.Environment}", new SecurityGroupProps
+            {
+                Vpc = vpc,
+                SecurityGroupName = $"identity-database-migration-security-group-{config.Environment}",
+                Description = "Migration task security group for the identity database",
+                AllowAllOutbound = true
+            });
+
+        databaseSecurityGroup.AddIngressRule(migrationSecurityGroup, Port.Tcp(1433), "Allow database access from the migration task security group");
 
         var databaseInstance = new DatabaseInstance(this, $"identity-database-instance-{config.Environment}", new DatabaseInstanceProps
         {
@@ -61,6 +72,13 @@ public sealed class Storage : Construct
         DatabaseSecret = databaseInstance.Secret;
         DatabaseEndPoint = databaseEndPointParameter;
         DatabaseSecurityGroup = databaseSecurityGroup;
+
+        _ = new StringParameter(this, "invoice-app-identity-database-migration-param", new StringParameterProps
+        {
+            ParameterName = $"{parameters.Network}/migration-sg-id",
+            StringValue = migrationSecurityGroup.SecurityGroupId,
+            Description = "Migration task security group Id for the identity database"
+        });
     }
 
     public ISecret? DatabaseSecret { get; }

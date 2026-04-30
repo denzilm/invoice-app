@@ -8,7 +8,9 @@ var app = new App();
 var env = app.Node.TryGetContext("env").ToString() ?? "dev";
 var config = new AppConfig(env)
 {
-    ImageTag = System.Environment.GetEnvironmentVariable("IMAGE_TAG") ?? "latest"
+    ImageTag = System.Environment.GetEnvironmentVariable("IMAGE_TAG") ?? "latest",
+    MigrationTag = System.Environment.GetEnvironmentVariable("MIGRATION_TAG") ?? "latest",
+    GitCommit = System.Environment.GetEnvironmentVariable("GIT_COMMIT") ?? "unknown"
 };
 
 var stack = new IdentityStack(app, $"invoice-app-identity-{env}", config, new StackProps

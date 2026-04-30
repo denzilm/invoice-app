@@ -37,9 +37,16 @@ public sealed class InvoiceAppCoreConstruct : Construct
             ]
         });
 
-        var repository = new Repository(this, "invoice-app-identity-api", new RepositoryProps
+        var identityRepository = new Repository(this, "invoice-app-identity-api", new RepositoryProps
         {
             RepositoryName = "invoice-app-identity-api",
+            ImageTagMutability = TagMutability.MUTABLE,
+            RemovalPolicy = RemovalPolicy.DESTROY
+        });
+
+        var identityMigrationRepository = new Repository(this, "invoice-app-identity-api-migration", new RepositoryProps
+        {
+            RepositoryName = "invoice-app-identity-api-migration",
             ImageTagMutability = TagMutability.MUTABLE,
             RemovalPolicy = RemovalPolicy.DESTROY
         });
@@ -67,10 +74,16 @@ public sealed class InvoiceAppCoreConstruct : Construct
             StringValue = vpc.VpcId
         });
 
-        _ = new StringParameter(this, "EcrRepository", new StringParameterProps
+        _ = new StringParameter(this, "IdentityApiEcrRepository", new StringParameterProps
         {
             ParameterName = parameters.EcrIdentityRepositoryName,
-            StringValue = repository.RepositoryName
+            StringValue = identityRepository.RepositoryName
+        });
+
+        _ = new StringParameter(this, "IdentityApiMigrationEcrRepository", new StringParameterProps
+        {
+            ParameterName = parameters.EcrIdentityMigrationRepositoryName,
+            StringValue = identityMigrationRepository.RepositoryName
         });
 
         _ = new StringParameter(this, "Cluster", new StringParameterProps
@@ -84,5 +97,15 @@ public sealed class InvoiceAppCoreConstruct : Construct
             ParameterName = parameters.ExecutionRoleArn,
             StringValue = executionRole.RoleArn
         });
+
+        _ = new StringParameter(this, "invoice-app-private-subnetIds", new StringParameterProps
+        {
+            ParameterName = $"{parameters.Network}/private-subnet-ids",
+            StringValue = string.Join(",",
+                vpc.PrivateSubnets.Select(subnet => subnet.SubnetId)),
+            Description = "Comma-separated list of private subnet IDs for the application VPC",
+        });
+
+        _ = new CfnOutput(this, "ClusterName", new CfnOutputProps { Value = cluster.ClusterName });
     }
 }

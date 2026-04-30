@@ -4,42 +4,23 @@ on:
   push:
     branches:
       - main
+      - develop
       - release/*
     paths:
+      - Aspire/**
       - Identity/**
       - Shared/**
+      - Infrastructure/**
+      - .github/workflows/identity-api.yml
+  workflow_dispatch:
 permissions:
   contents: read
-env:
-  DOTNET_VERSION: 10.x
-  BUILD_CONFIGURATION: Release
 jobs:
-  build:
-    name: Build Identity
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v6
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Restore Dependencies
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build --no-restore --configuration ${{ env.BUILD_CONFIGURATION }}
-
-      - name: Test
-        run: dotnet test --configuration ${{ env.BUILD_CONFIGURATION }} --no-build --verbosity normal
-
-      - name: Publish
-        run: dotnet publish Identity/src/FrontendMentor.InvoiceApp.Identity.Api --configuration ${{ env.BUILD_CONFIGURATION }} --no-build --output artifacts
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: identity-api
-          path: artifacts
+  # --- Development ---
+  shared-development:
+    name: Deploy Shared Infrastructure (Development)
+    uses: ./.github/workflows/_shared.yml
+    with:
+      environment: Development
+    secrets:
+        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEVELOPMENT }}

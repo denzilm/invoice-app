@@ -5,7 +5,6 @@ using FrontendMentor.InvoiceApp.Identity.Infrastructure.IdentityPersistence;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.DataProtection.StackExchangeRedis;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 using static FrontendMentor.InvoiceApp.AspireUtilities.AspireConstants;
@@ -58,8 +57,6 @@ app.UseExceptionHandler();
 app.MapGet("/", (AuthDbContext context) => $"We have currently '{context.Users.ToList().Count}' users");
 
 app.MapHealthChecks("/healthz");
-
-app.Services.GetRequiredService<AuthDbContext>().Database.Migrate();
 
 app.Run();
 
