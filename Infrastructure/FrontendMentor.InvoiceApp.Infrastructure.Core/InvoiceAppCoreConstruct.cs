@@ -10,6 +10,8 @@ namespace FrontendMentor.InvoiceApp.Infrastructure.Core;
 
 public sealed class InvoiceAppCoreConstruct : Construct
 {
+    public ICluster Cluster { get; }
+
     public InvoiceAppCoreConstruct(Construct scope, string id, AppConfig config)
         : base(scope, id)
     {
@@ -51,7 +53,7 @@ public sealed class InvoiceAppCoreConstruct : Construct
             RemovalPolicy = RemovalPolicy.DESTROY
         });
 
-        var cluster = new Cluster(this, "invoice-app-cluster", new ClusterProps
+        Cluster = new Cluster(this, "invoice-app-cluster", new ClusterProps
         {
             Vpc = vpc,
             ClusterName = $"invoice-app-cluster-{config.Environment}"
@@ -89,7 +91,7 @@ public sealed class InvoiceAppCoreConstruct : Construct
         _ = new StringParameter(this, "Cluster", new StringParameterProps
         {
             ParameterName = parameters.ClusterArn,
-            StringValue = cluster.ClusterArn
+            StringValue = Cluster.ClusterArn
         });
 
         _ = new StringParameter(this, "ExecutionRole", new StringParameterProps
@@ -105,7 +107,5 @@ public sealed class InvoiceAppCoreConstruct : Construct
                 vpc.PrivateSubnets.Select(subnet => subnet.SubnetId)),
             Description = "Comma-separated list of private subnet IDs for the application VPC",
         });
-
-        _ = new CfnOutput(this, "ClusterName", new CfnOutputProps { Value = cluster.ClusterName });
     }
 }

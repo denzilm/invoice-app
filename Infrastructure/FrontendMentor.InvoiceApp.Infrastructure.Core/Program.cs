@@ -5,7 +5,7 @@ using Environment = Amazon.CDK.Environment;
 
 var app = new App();
 
-var env = app.Node.TryGetContext("env").ToString() ?? "dev";
+var env = System.Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "dev";
 var config = new AppConfig(env);
 
 var stack = new InvoiceAppStack(app, $"invoice-app-{env}", config, new StackProps

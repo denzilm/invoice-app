@@ -5,7 +5,7 @@ using Environment = Amazon.CDK.Environment;
 
 var app = new App();
 
-var env = app.Node.TryGetContext("env").ToString() ?? "dev";
+var env = System.Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "dev";
 var config = new AppConfig(env)
 {
     ImageTag = System.Environment.GetEnvironmentVariable("IMAGE_TAG") ?? "latest",

@@ -15,12 +15,12 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  id-token: write
 jobs:
-  # --- Development ---
   shared-development:
     name: Deploy Shared Infrastructure (Development)
     uses: ./.github/workflows/_shared.yml
     with:
       environment: Development
     secrets:
-        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEVELOPMENT }}
+        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
