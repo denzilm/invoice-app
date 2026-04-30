@@ -47,9 +47,9 @@ jobs:
 
       - name: Deploy Shared Stack
         id: cdk
+        working-directory: Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Core
         run: |
           cdk deploy \
-          --app Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Core \
           --require-approval never --outputs-file cdk-outputs.json
           
           echo "cluster-name=$(jq -r '.. | .ClusterName? // empty' cdk-outputs.json)" >> $GITHUB_OUTPUT
