@@ -10,7 +10,7 @@ public sealed class InvoiceAppStack : Stack
     {
         var coreConstruct = new InvoiceAppCoreConstruct(this, $"networking-{config.Environment}", config);
 
-        _ = new CfnOutput(this, "invoice-app-cluster-name", new CfnOutputProps
+        _ = new CfnOutput(this, "ClusterName", new CfnOutputProps
         {
             Value = coreConstruct.Cluster.ClusterName
         });
