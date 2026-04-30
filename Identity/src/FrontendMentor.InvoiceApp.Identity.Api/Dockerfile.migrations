@@ -1,0 +1,27 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
+COPY ["Directory.Build.props", "Directory.Build.props"]
+COPY ["Directory.Packages.props", "Directory.Packages.props"]
+COPY ["Identity/src/FrontendMentor.InvoiceApp.Identity.Api/FrontendMentor.InvoiceApp.Identity.Api.csproj", "Identity/src/FrontendMentor.InvoiceApp.Identity.Api/"]
+COPY ["Aspire/FrontendMentor.InvoiceApp.AspireUtilities/FrontendMentor.InvoiceApp.AspireUtilities.csproj", "Aspire/FrontendMentor.InvoiceApp.AspireUtilities/"]
+COPY ["Aspire/FrontendMentor.InvoiceApp.ServiceDefaults/FrontendMentor.InvoiceApp.ServiceDefaults.csproj", "Aspire/FrontendMentor.InvoiceApp.ServiceDefaults/"]
+COPY ["Identity/src/FrontendMentor.InvoiceApp.Identity.Infrastructure/FrontendMentor.InvoiceApp.Identity.Infrastructure.csproj", "Identity/src/FrontendMentor.InvoiceApp.Identity.Infrastructure/"]
+RUN dotnet restore "Identity/src/FrontendMentor.InvoiceApp.Identity.Api/FrontendMentor.InvoiceApp.Identity.Api.csproj"
+
+COPY . .
+
+WORKDIR /src/Identity
+RUN dotnet ef migrations bundle \
+    --project src/FrontendMentor.InvoiceApp.Identity.Infrastructure/FrontendMentor.InvoiceApp.Identity.Infrastructure.csproj \
+    --startup-project src/FrontendMentor.InvoiceApp.Identity.Api/FrontendMentor.InvoiceApp.Identity.Api.csproj \
+    --output /migrations/migrate \
+    --self-contained \
+    -r linux-x64
+
+FROM mcr.microsoft.com/dotnet/runtime-deps:10.0
+COPY --from=build /migrations/migrate /migrate
+ENTRYPOINT ["/migrate"]

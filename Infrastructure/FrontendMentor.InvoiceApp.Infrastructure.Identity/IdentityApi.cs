@@ -5,6 +5,7 @@ using Amazon.CDK.AWS.ECS;
 using Amazon.CDK.AWS.ElasticLoadBalancingV2;
 using Amazon.CDK.AWS.IAM;
 using Amazon.CDK.AWS.SecretsManager;
+using Amazon.CDK.AWS.SSM;
 using Constructs;
 using HealthCheck = Amazon.CDK.AWS.ECS.HealthCheck;
 using Protocol = Amazon.CDK.AWS.ECS.Protocol;
@@ -77,15 +78,28 @@ public sealed class IdentityApi : Construct
             ]
         }));
 
+        var parameters = new Parameters(config);
+        var serviceRepo = Repository.FromRepositoryName(
+            this,
+            "invoice-app-identity-api",
+            StringParameter.ValueForStringParameter(this, parameters.EcrIdentityRepositoryName)
+        );
+
+        var migrationsRepo = Repository.FromRepositoryName(
+            this,
+            "invoice-app-identity-api-migrations",
+            StringParameter.ValueForStringParameter(this, parameters.EcrIdentityMigrationRepositoryName)
+        );
+
         var taskDefinition = new FargateTaskDefinition(this, "invoice-app-identity-api-task-definition",
             new FargateTaskDefinitionProps
             {
                 ExecutionRole = props.ExecutionRole,
-                TaskRole = taskRole
+                TaskRole = taskRole,
             });
         taskDefinition.AddContainer($"invoice-app-identity-api-{config.Environment}", new ContainerDefinitionOptions
         {
-            Image = ContainerImage.FromEcrRepository(props.IdentityRepository, config.ImageTag),
+            Image = ContainerImage.FromEcrRepository(serviceRepo, config.ImageTag),
             PortMappings =
             [
                 new PortMapping
@@ -131,6 +145,31 @@ public sealed class IdentityApi : Construct
             EnableExecuteCommand = true
         });
 
+        var migrationTaskDef = new FargateTaskDefinition(this, "invoice-app-identity-migration-task-definition",
+            new FargateTaskDefinitionProps
+            {
+                ExecutionRole = props.ExecutionRole,
+                TaskRole = taskRole,
+                Family = $"invoice-app-identity-api-migration-{config.Environment}"
+            });
+
+        migrationTaskDef.AddContainer($"invoice-app-identity-api-migration-{config.Environment}",
+            new ContainerDefinitionOptions
+            {
+                Image = ContainerImage.FromEcrRepository(migrationsRepo, config.MigrationTag),
+                Essential = true,
+                Secrets = new Dictionary<string, Secret>
+                {
+                    ["ConnectionStrings__Default"] = Secret.FromSecretsManager(props.DatabaseSecret!)
+                },
+                Logging = LogDrivers.AwsLogs(new AwsLogDriverProps
+                {
+                    StreamPrefix = $"invoice-app-identity-api-migrations-{config.Environment}",
+                    Mode = AwsLogDriverMode.NON_BLOCKING,
+                    MaxBufferSize = Size.Mebibytes(25)
+                })
+            });
+
         var targetGroup = new ApplicationTargetGroup(this, "invoice-app-identity-api-target-group",
             new ApplicationTargetGroupProps
             {
@@ -161,7 +200,6 @@ public sealed class IdentityApi : Construct
 public sealed record IdentityApiProps
 {
     public required IVpc Vpc { get; init; }
-    public required IRepository IdentityRepository { get; init; }
     public required ISecurityGroup DatabaseSecurityGroup { get; init; }
     public required ISecret? DatabaseSecret { get; init; }
     public required IRole ExecutionRole { get; init; }
