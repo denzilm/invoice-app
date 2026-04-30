@@ -17,7 +17,6 @@ permissions:
   contents: read
   id-token: write
 jobs:
-  # --- Development ---
   shared-development:
     name: Deploy Shared Infrastructure (Development)
     uses: ./.github/workflows/_shared.yml

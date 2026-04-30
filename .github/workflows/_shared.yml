@@ -49,9 +49,7 @@ jobs:
         id: cdk
         working-directory: Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Core
         run: |
-          cdk deploy \
-          --require-approval never --outputs-file cdk-outputs.json
-          
+          cdk deploy --require-approval never --outputs-file cdk-outputs.json
           echo "cluster-name=$(jq -r '.. | .ClusterName? // empty' cdk-outputs.json)" >> $GITHUB_OUTPUT
         env:
           ENVIRONMENT: ${{ inputs.environment }}

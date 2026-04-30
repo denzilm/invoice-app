@@ -8,6 +8,11 @@ public sealed class InvoiceAppStack : Stack
     internal InvoiceAppStack(Construct scope, string id, AppConfig config, IStackProps? props = null)
         : base(scope, id, props)
     {
-        _ = new InvoiceAppCoreConstruct(this, $"networking-{config.Environment}", config);
+        var coreConstruct = new InvoiceAppCoreConstruct(this, $"networking-{config.Environment}", config);
+
+        _ = new CfnOutput(this, "invoice-app-cluster-name", new CfnOutputProps
+        {
+            Value = coreConstruct.Cluster.ClusterName
+        });
     }
 }
