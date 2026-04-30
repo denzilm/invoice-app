@@ -24,4 +24,4 @@ jobs:
     with:
       environment: Development
     secrets:
-        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEVELOPMENT }}
+        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
