@@ -3,6 +3,9 @@
 on:
   workflow_call:
     inputs:
+      environment:
+        required: true
+        type: string
       apiName:
         required: true
         type: string
@@ -77,6 +80,7 @@ jobs:
     name: Build and Push Docker Image
     needs: test
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6
