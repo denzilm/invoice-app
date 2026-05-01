@@ -1,0 +1,15 @@
+﻿mode: ContinuousDelivery
+next-version: 0.0.0
+
+major-version-bump-message: '^(break|breaking)'
+minor-version-bump-message: '^(feat|feature)'
+patch-version-bump-message: '^(fix|patch|chore|build|ci)'
+
+branches:
+  main:
+    label: ''
+  feature:
+    regex: '^.*'
+    label: 'preview'
+  pull-request:
+    label: 'pr'
