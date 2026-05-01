@@ -6,21 +6,43 @@ on:
       - main
       - develop
       - release/*
+    tags: ['v*.*.*']
     paths:
       - Aspire/**
       - Identity/**
       - Shared/**
       - Infrastructure/**
       - .github/workflows/identity-api.yml
+      - .github/workflows/_shared.yml
+      - .github/workflows/_build.yml
   workflow_dispatch:
+
 permissions:
   contents: read
   id-token: write
+  checks: write
+
 jobs:
   shared-development:
     name: Deploy Shared Infrastructure (Development)
     uses: ./.github/workflows/_shared.yml
     with:
       environment: Development
+    secrets:
+        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
+  build-development:
+    name: Build Identity API
+    needs: shared-development
+    uses: ./.github/workflows/_build.yml
+    with:
+      environment: Development
+      apiName: invoice-app-identity-api
+      gitversion-config: Identity/src/FrontendMentor.InvoiceApp.Identity.Api/GitVersion.yml
+      context: .
+      dockerfile: Identity/src/FrontendMentor.InvoiceApp.Identity.Api/Dockerfile
+      ecr-registry: ${{ needs.shared-development.outputs.ecr-registry }}
+      build-configuration: Release
+      dotnet_version: 10.x
+      api_test_filter: "FullyQualifiedName~FrontendMentor.InvoiceApp.Identity"
     secrets:
         AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}

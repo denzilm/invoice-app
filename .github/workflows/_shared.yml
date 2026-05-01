@@ -1,4 +1,5 @@
 ﻿name: Deploy Shared Infrastructure
+
 on:
   workflow_call:
     inputs:
