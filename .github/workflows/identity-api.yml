@@ -36,7 +36,6 @@ jobs:
       ecr-registry: ${{ needs.shared-development.outputs.ecr-registry }}
       build-configuration: Release
       dotnet_version: 10.x
-      api_directory: Identity/src/FrontendMentor.InvoiceApp.Identity.Api
       api_test_filter: "FullyQualifiedName~FrontendMentor.InvoiceApp.Identity"
     secrets:
         AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
