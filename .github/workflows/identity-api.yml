@@ -35,9 +35,8 @@ jobs:
     needs: shared-development
     uses: ./.github/workflows/_build.yml
     with:
-      apiName: Identity API
-      context: .
       apiName: invoice-app-identity-api
+      context: .
       ecr-registry: ${{ needs.shared-development.outputs.ecr-registry }}
       build-configuration: ${{ env.BUILD_CONFIGURATION }}
       dotnet_version: ${{ env.DOTNET_VERSION }}
