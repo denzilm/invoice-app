@@ -73,7 +73,7 @@ jobs:
           name: ${{ inputs.apiName }}-test-results
           path: ./test-results/**/*
       - name: Publish Test Results
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v3
         if: always()
         with:
           name: ${{ inputs.apiName }} Tests
