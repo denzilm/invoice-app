@@ -38,6 +38,7 @@ jobs:
       environment: Development
       apiName: invoice-app-identity-api
       context: .
+      dockerfile: Identity/src/FrontendMentor.InvoiceApp.Identity.Api/Dockerfile
       ecr-registry: ${{ needs.shared-development.outputs.ecr-registry }}
       build-configuration: Release
       dotnet_version: 10.x
