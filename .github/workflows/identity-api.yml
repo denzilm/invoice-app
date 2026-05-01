@@ -18,7 +18,7 @@ permissions:
   contents: read
   id-token: write
 
-env:
+vars:
   DOTNET_VERSION: 10.x
   BUILD_CONFIGURATION: Release
 
@@ -38,8 +38,8 @@ jobs:
       apiName: invoice-app-identity-api
       context: .
       ecr-registry: ${{ needs.shared-development.outputs.ecr-registry }}
-      build-configuration: ${{ env.BUILD_CONFIGURATION }}
-      dotnet_version: ${{ env.DOTNET_VERSION }}
+      build-configuration: ${{ vars.BUILD_CONFIGURATION }}
+      dotnet_version: ${{ vars.DOTNET_VERSION }}
       api_directory: Identity/src/FrontendMentor.InvoiceApp.Identity.Api
       api_test_filter: "FullyQualifiedName~FrontendMentor.InvoiceApp.Identity"
     secrets:
