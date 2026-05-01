@@ -112,6 +112,7 @@ jobs:
           file: ${{ inputs.dockerfile }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+          provenance: false
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
