@@ -61,3 +61,8 @@ jobs:
         with:
           name: ${{ inputs.apiName }}-test-results
           path: ./test-results/**/*
+      - name: Test Summary
+        uses: test-summary/action@v2
+        with:
+          paths: "test-results/**/*.trx"
+        if: always() # Ensures summary is created even if tests fail
