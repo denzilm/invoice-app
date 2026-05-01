@@ -37,6 +37,7 @@ jobs:
     with:
       environment: Development
       apiName: invoice-app-identity-api
+      gitversion-config: Identity/src/FrontendMentor.InvoiceApp.Identity.Api/GitVersion.yml
       context: .
       dockerfile: Identity/src/FrontendMentor.InvoiceApp.Identity.Api/Dockerfile
       ecr-registry: ${{ needs.shared-development.outputs.ecr-registry }}
