@@ -28,6 +28,11 @@ on:
       image-tag:
         value: ${{ jobs.test.outputs.image-tag }}
 
+permissions:
+  contents: read
+  id-token: write
+  checks: write
+
 jobs:
   test:
     name: Build and Test API
@@ -68,3 +73,34 @@ jobs:
           name: ${{ inputs.apiName }} Tests
           path: ./test-results/**/*.trx
           reporter: dotnet-trx
+  build:
+    name: Build and Push Docker Image
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ap-southeast-2
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Generate Tags
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ inputs.ecr-registry }}/${{ inputs.apiName }}
+          tags: |
+            type=raw,value=${{ needs.test.outputs.image-tag }}
+            type=sha
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ inputs.context }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            GIT_COMMIT=${{ github.sha }}
