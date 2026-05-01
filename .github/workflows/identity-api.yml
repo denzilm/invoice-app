@@ -13,14 +13,35 @@ on:
       - Infrastructure/**
       - .github/workflows/identity-api.yml
   workflow_dispatch:
+
 permissions:
   contents: read
   id-token: write
+
+env:
+  DOTNET_VERSION: 10.x
+  BUILD_CONFIGURATION: Release
+
 jobs:
   shared-development:
     name: Deploy Shared Infrastructure (Development)
     uses: ./.github/workflows/_shared.yml
     with:
       environment: Development
+    secrets:
+        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
+  build:
+    name: Build Identity API
+    needs: shared-development
+    uses: ./.github/workflows/_build.yml
+    with:
+      apiName: Identity API
+      context: .
+      apiName: invoice-app-identity-api
+      ecr-registry: ${{ needs.shared-development.outputs.ecr-registry }}
+      build-configuration: ${{ env.BUILD_CONFIGURATION }}
+      dotnet_version: ${{ env.DOTNET_VERSION }}
+      api_directory: Identity/src/FrontendMentor.InvoiceApp.Identity.Api
+      api_test_filter: "FullyQualifiedName~FrontendMentor.InvoiceApp.Identity"
     secrets:
         AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}

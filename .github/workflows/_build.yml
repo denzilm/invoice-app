@@ -1,0 +1,67 @@
+﻿name: Build and Push
+
+on:
+  workflow_call:
+    inputs:
+      apiName:
+        required: true
+        type: string
+      context:
+        required: true
+        type: string
+      api_directory:
+        required: true
+        type: string
+      api_test_filter:
+        required: true
+        type: string
+      ecr-registry:
+        required: true
+        type: string
+      build-configuration:
+        required: true
+        type: string
+      dotnet_version:
+        required: true
+        type: string
+    secrets:
+        AWS_ROLE_ARN:
+            required: true
+    outputs:
+      image-tag:
+        value: ${{ jobs.build.outputs.image-tag }}
+
+jobs:
+  test:
+    name: Build and Test API
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.gitversion.outputs.semVer }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@4.5.0
+        with:
+          versionSpec: '6.x'
+      - name: Determine Version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@4.5.0
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ inputs.dotnet_version }}
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        working-directory: ${{ inputs.api_directory }}
+        run: dotnet build --no-restore --configuration ${{ inputs.build-configuration }}
+      - name: Test
+      run: dotnet test --filter ${{ inputs.api_test_filter }} --configuration ${{ inputs.build-configuration }} --no-build --verbosity normal --logger trx --results-directory ./test-results --collect:"XPlat Code Coverage"
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ inputs.apiName }}-test-results
+          path: ${{ inputs.api_test_directory }}/test-results/**/*
