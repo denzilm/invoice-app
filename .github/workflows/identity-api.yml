@@ -6,12 +6,15 @@ on:
       - main
       - develop
       - release/*
+    tags: ['v*.*.*']
     paths:
       - Aspire/**
       - Identity/**
       - Shared/**
       - Infrastructure/**
       - .github/workflows/identity-api.yml
+      - .github/workflows/_shared.yml
+      - .github/workflows/_build.yml
   workflow_dispatch:
 
 permissions:

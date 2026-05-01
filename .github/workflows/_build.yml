@@ -61,8 +61,10 @@ jobs:
         with:
           name: ${{ inputs.apiName }}-test-results
           path: ./test-results/**/*
-      - name: Test Summary
-        uses: test-summary/action@v2
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: always()
         with:
-          paths: "test-results/**/*.trx"
-        if: always() # Ensures summary is created even if tests fail
+          name: ${{ inputs.apiName }} Tests
+          path: ./test-results/**/*.trx
+          reporter: dotnet-trx
