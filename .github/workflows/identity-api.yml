@@ -18,10 +18,6 @@ permissions:
   contents: read
   id-token: write
 
-vars:
-  DOTNET_VERSION: 10.x
-  BUILD_CONFIGURATION: Release
-
 jobs:
   shared-development:
     name: Deploy Shared Infrastructure (Development)
@@ -38,8 +34,8 @@ jobs:
       apiName: invoice-app-identity-api
       context: .
       ecr-registry: ${{ needs.shared-development.outputs.ecr-registry }}
-      build-configuration: ${{ vars.BUILD_CONFIGURATION }}
-      dotnet_version: ${{ vars.DOTNET_VERSION }}
+      build-configuration: Release
+      dotnet_version: 10.x
       api_directory: Identity/src/FrontendMentor.InvoiceApp.Identity.Api
       api_test_filter: "FullyQualifiedName~FrontendMentor.InvoiceApp.Identity"
     secrets:
