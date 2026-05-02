@@ -16,6 +16,7 @@ on:
       - .github/workflows/_shared.yml
       - .github/workflows/_build.yml
       - .github/workflows/_build-migrations.yml
+      - .github/workflows/_deploy-service.yml
   workflow_dispatch:
 
 permissions:
@@ -97,7 +98,7 @@ jobs:
   deploy-identity-api-development:
     name: Deploy Identity API (Development)
     needs: [version, shared-development, migrate-development]
-    uses: ./.github/workflows/_deploy-api.yml
+    uses: ./.github/workflows/_deploy-service.yml
     with:
       environment: Development
       apiName: invoice-app-identity-api
