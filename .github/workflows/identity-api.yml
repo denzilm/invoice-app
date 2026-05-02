@@ -47,6 +47,8 @@ jobs:
       apiName: invoice-app-identity-api
       service-stack-directory: Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Identity
       cluster: ${{ needs.shared-development.outputs.cluster-name }}
+      image-tag: ${{ needs.version.outputs.image-tag }}
+      git-commit: ${{ github.sha }}
     secrets:
       AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
 
@@ -89,5 +91,19 @@ jobs:
       environment: Development
       apiName: invoice-app-identity-api
       cluster: ${{ needs.shared-development.outputs.cluster-name }}
+    secrets:
+        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
+
+  deploy-identity-api-development:
+    name: Deploy Identity API (Development)
+    needs: [version, shared-development, migrate-development]
+    uses: ./.github/workflows/_deploy-api.yml
+    with:
+      environment: Development
+      apiName: invoice-app-identity-api
+      service-stack-directory: Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Identity
+      cluster: ${{ needs.shared-development.outputs.cluster-name }}
+      image-tag: ${{ needs.version.outputs.image-tag }}
+      git-commit: ${{ github.sha }}
     secrets:
         AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}

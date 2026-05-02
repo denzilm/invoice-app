@@ -15,6 +15,12 @@ on:
       cluster:
         required: true
         type: string
+      image-tag:
+        required: true
+        type: string
+      git-commit:
+        required: true
+        type: string
     secrets:
       AWS_ROLE_ARN:
         required: true
@@ -60,5 +66,7 @@ jobs:
         run: |
           cdk deploy --require-approval never
         env:
+          IMAGE_TAG: ${{ inputs.image-tag }}
+          GIT_COMMIT: ${{ inputs.git-commit }}
           ENVIRONMENT: ${{ inputs.environment }}
           INITIAL_DEPLOY: ${{ steps.check.outputs.initial }}

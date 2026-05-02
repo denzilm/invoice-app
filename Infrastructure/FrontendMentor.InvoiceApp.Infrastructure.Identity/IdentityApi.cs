@@ -45,7 +45,7 @@ public sealed class IdentityApi : Construct
         });
         apiSecurityGroup
             .AddIngressRule(
-                Peer.SecurityGroupId(loadBalancerSecurityGroup.SecurityGroupId), Port.HTTP, "Allows HTTP traffic from the load balancer");
+                Peer.SecurityGroupId(loadBalancerSecurityGroup.SecurityGroupId), Port.Tcp(8080), "Allows HTTP traffic from the load balancer");
 
         props.DatabaseSecurityGroup
             .AddIngressRule(
