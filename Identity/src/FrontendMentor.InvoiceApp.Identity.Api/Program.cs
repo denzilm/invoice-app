@@ -18,14 +18,10 @@ builder.AddServiceDefaults();
 var dbSecretJson = Environment.GetEnvironmentVariable("DB_SECRET");
 if (dbSecretJson is not null)
 {
-    Console.WriteLine($"JSON: {dbSecretJson}");
     var secret = JsonSerializer.Deserialize<DbSecret>(dbSecretJson)!;
-    Console.WriteLine($"Secret: {secret}");
     configuration[$"ConnectionStrings:{Databases.AuthDb}"] =
         $"Server={secret.Host},{secret.Port}; Database={secret.Database};" +
         $"User Id={secret.Username};Password={secret.Password};TrustServerCertificate=true";
-
-    Console.WriteLine($"Config:  {configuration[$"ConnectionStrings:{Databases.AuthDb}"]}");
 }
 
 builder.AddSqlServerDbContext<AuthDbContext>(Databases.AuthDb);
@@ -74,6 +70,6 @@ internal sealed record DbSecret
     public required string Username { get; init; }
     [JsonPropertyName("password")]
     public required string Password { get; init; }
-    [JsonPropertyName("databaseInstanceIdentifier")]
+    [JsonPropertyName("dbInstanceIdentifier")]
     public required string Database { get; init; }
 }
