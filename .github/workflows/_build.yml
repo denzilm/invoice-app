@@ -15,6 +15,9 @@ on:
       dockerfile:
         required: true
         type: string
+      image-tag:
+        required: true
+        type: string
       api_test_filter:
         required: true
         type: string
@@ -27,15 +30,9 @@ on:
       dotnet_version:
         required: true
         type: string
-      gitversion-config:
-        required: true
-        type: string
     secrets:
         AWS_ROLE_ARN:
             required: true
-    outputs:
-      image-tag:
-        value: ${{ jobs.test.outputs.image-tag }}
 
 permissions:
   contents: read
@@ -46,22 +43,7 @@ jobs:
   test:
     name: Build and Test API
     runs-on: ubuntu-latest
-    outputs:
-      image-tag: ${{ steps.gitversion.outputs.semVer }}
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-      - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v4
-        with:
-          versionSpec: '6.x'
-      - name: Determine Version
-        id: gitversion
-        uses: gittools/actions/gitversion/execute@v4
-        with:
-          configFilePath: ${{ inputs.gitversion-config }}
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
@@ -105,7 +87,7 @@ jobs:
         with:
           images: ${{ inputs.ecr-registry }}/${{ inputs.apiName }}
           tags: |
-            type=raw,value=${{ needs.test.outputs.image-tag }}
+            type=raw,value=${{ inputs.image-tag }}
             type=sha
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
       - name: Set up Docker Buildx
