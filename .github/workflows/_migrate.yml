@@ -54,7 +54,7 @@ jobs:
           
           echo "Migration Task ARN: $TASK_ARN"
           
-          aws ecs wait task-stopped --cluster ${{ inputs.cluster }} --tasks $TASK_ARN
+          aws ecs wait tasks-stopped --cluster ${{ inputs.cluster }} --tasks $TASK_ARN
           
           EXIT_CODE=$(aws ecs describe-tasks \
             --cluster ${{ inputs.cluster }} \
