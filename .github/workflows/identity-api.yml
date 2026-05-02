@@ -83,7 +83,7 @@ jobs:
 
   migrate-development:
     name: Run Identity API Migrations
-    needs: [deploy-identity-api-stack-development, build-migrations-development]
+    needs: [shared-development, deploy-identity-api-stack-development, build-migrations-development]
     uses: ./.github/workflows/_migrate.yml
     with:
       environment: Development
