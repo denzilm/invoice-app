@@ -55,6 +55,8 @@ jobs:
             --query 'services[0].desiredCount' \
             --output text 2>/dev/null || echo "0")
           
+          echo "Desired count: $DESIRED"
+          
           if [ "$DESIRED" = "0" ] || [ "$DESIRED" = "None" ]; then
             echo "initial=true" >> $GITHUB_OUTPUT
           else

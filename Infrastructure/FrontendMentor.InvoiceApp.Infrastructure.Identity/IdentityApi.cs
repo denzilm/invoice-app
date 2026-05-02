@@ -94,6 +94,7 @@ public sealed class IdentityApi : Construct
         var taskDefinition = new FargateTaskDefinition(this, "invoice-app-identity-api-task-definition",
             new FargateTaskDefinitionProps
             {
+                Family = $"invoice-app-identity-api-{config.Environment}",
                 ExecutionRole = props.ExecutionRole,
                 TaskRole = taskRole,
             });

@@ -64,13 +64,21 @@ jobs:
 
       - name: Verify deployment
         run: |
-          RUNNING_IMAGE=$(aws ecs describe-services \
-            --cluster ${{ inputs.cluster }} \
-            --services ${{ inputs.apiName }}-${{ inputs.environment }} \
-            --query 'services[0].deployments[?status==`PRIMARY`].taskDefinition' \
-            --output text | xargs aws ecs describe-task-definition \
-            --query 'taskDefinition.containerDefinitions[0].image' \
+          TASK_DEF=$(aws ecs describe-services \
+            --cluster invoice-app-cluster-Development \
+            --services "$SERVICE_NAME" \
+            --query 'services[0].taskDefinition' \
             --output text)
+  
+          if [ -z "$TASK_DEF" ] || [ "$TASK_DEF" = "None" ]; then
+            echo "No task definition found (service may not be ready yet)"
+            exit 1
+          fi
+  
+          RUNNING_IMAGE=$(aws ecs describe-task-definition \
+            --task-definition "$TASK_DEF" \
+            --query 'taskDefinition.containerDefinitions[0].image' \
+            --output text)        
           
           echo "Running image: $RUNNING_IMAGE"
           
