@@ -38,6 +38,17 @@ jobs:
     secrets:
         AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
 
+  deploy-identity-api-stack-development:
+    name: Deploy Identity API Stack (Development)
+    needs: [ shared-development ]
+    uses: ./.github/workflows/_deploy-stack.yml
+    with:
+      environment: Development
+      apiName: invoice-app-identity-api
+      service-stack-directory: Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Identity
+    secrets:
+      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
+
   build-development:
     name: Build Identity API
     needs: [version, shared-development]
