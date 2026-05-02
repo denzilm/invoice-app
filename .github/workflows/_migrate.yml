@@ -47,7 +47,7 @@ jobs:
           TASK_ARN=$(aws ecs run-task \
             --cluster ${{ inputs.cluster }} \
             --launch-type FARGATE \
-            --network-configuration "awsvpcConfiguration={subnets=${{ steps.network.outputs.subnet-ids }},securityGroups=${{ steps.network.outputs.sg-id }},assignPublicIp=ENABLED}" \
+            --network-configuration "awsvpcConfiguration={subnets=[${{ steps.network.outputs.subnet-ids }}],securityGroups=[${{ steps.network.outputs.sg-id }}],assignPublicIp=ENABLED}" \
             --task-definition ${{ inputs.apiName }}-migration-${{ inputs.environment }} \
             --query 'tasks[0].taskArn' \
             --output text)
