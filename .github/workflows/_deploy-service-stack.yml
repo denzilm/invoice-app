@@ -1,0 +1,64 @@
+﻿name: Deploy Service Stack
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      apiName:
+        required: true
+        type: string
+      service-stack-directory:
+        required: true
+        type: string
+      cluster:
+        required: true
+        type: string
+    secrets:
+      AWS_ROLE_ARN:
+        required: true
+
+jobs:
+  deploy:
+    name: Deploy ${{ inputs.apiName }} Infrastructure
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Install CDK CLI
+        run: npm install -g aws-cdk
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ap-southeast-2
+
+      - name: Check if initial deployment
+        id: check
+        run: |
+          DESIRED=$(aws ecs describe-services \
+            --cluster ${{ inputs.cluster }} \
+            --services ${{ inputs.apiName }}-${{ inputs.environment }} \
+            --query 'services[0].desiredCount' \
+            --output text 2>/dev/null || echo "0")
+          
+          if [ "$DESIRED" = "0" ] || [ "$DESIRED" = "None" ]; then
+            echo "initial=true" >> $GITHUB_OUTPUT
+          else
+            echo "initial=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy ${{ inputs.apiName }} Stack
+        working-directory: ${{ inputs.service-stack-directory }}
+        run: |
+          cdk deploy --require-approval never
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
+          INITIAL_DEPLOY: ${{ steps.check.outputs.initial }}
