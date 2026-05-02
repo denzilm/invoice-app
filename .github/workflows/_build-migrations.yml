@@ -18,6 +18,9 @@ on:
       ecr-registry:
         required: true
         type: string
+      image-tag:
+        required: true
+        type: string
     secrets:
         AWS_ROLE_ARN:
             required: true
