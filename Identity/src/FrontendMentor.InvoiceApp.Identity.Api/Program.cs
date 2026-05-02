@@ -19,9 +19,12 @@ var dbSecretJson = Environment.GetEnvironmentVariable("DB_SECRET");
 if (dbSecretJson is not null)
 {
     var secret = JsonSerializer.Deserialize<DbSecret>(dbSecretJson)!;
+    Console.WriteLine($"Secret: {secret}");
     configuration[$"ConnectionStrings:{Databases.AuthDb}"] =
         $"Server={secret.Host},{secret.Port}; Database={secret.Database};" +
         $"User Id={secret.Username};Password={secret.Password};TrustServerCertificate=true";
+
+    Console.WriteLine($"Config:  {configuration[$"ConnectionStrings:{Databases.AuthDb}"]}");
 }
 
 builder.AddSqlServerDbContext<AuthDbContext>(Databases.AuthDb);
