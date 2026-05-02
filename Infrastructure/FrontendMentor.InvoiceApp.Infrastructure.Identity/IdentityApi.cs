@@ -130,7 +130,7 @@ public sealed class IdentityApi : Construct
             }
         });
 
-        var service = new FargateService(this, "invoice-app-identity-api", new FargateServiceProps
+        var service = new FargateService(this, "invoice-app-identity-api-service", new FargateServiceProps
         {
             Cluster = props.Cluster,
             TaskDefinition = taskDefinition,
