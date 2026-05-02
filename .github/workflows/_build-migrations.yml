@@ -53,8 +53,8 @@ jobs:
           file: ${{ inputs.dockerfile }}
           push: true
           tags: |
-            ${{ inputs.ecr-registry }}/${{ inputs.apiName }}-migrations:${{ inputs.image-tag }}
-            ${{ inputs.ecr-registry }}/${{ inputs.apiName }}-migrations:latest
+            ${{ inputs.ecr-registry }}/${{ inputs.apiName }}-migration:${{ inputs.image-tag }}
+            ${{ inputs.ecr-registry }}/${{ inputs.apiName }}-migration:latest
           provenance: false
           cache-from: type=gha
           cache-to: type=gha,mode=max
