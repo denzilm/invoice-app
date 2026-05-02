@@ -66,7 +66,7 @@ jobs:
         run: |
           TASK_DEF=$(aws ecs describe-services \
             --cluster invoice-app-cluster-Development \
-            --services "$SERVICE_NAME" \
+            --services ${{ inputs.apiName }}-${{ inputs.environment }} \
             --query 'services[0].taskDefinition' \
             --output text)
   
