@@ -6,7 +6,7 @@ on:
       - main
       - develop
       - release/*
-    tags: ['v*.*.*']
+    tags: ['*.*.*']
     paths:
       - Aspire/**
       - Identity/**
@@ -15,6 +15,7 @@ on:
       - .github/workflows/identity-api.yml
       - .github/workflows/_shared.yml
       - .github/workflows/_build.yml
+      - .github/workflows/_build-migrations.yml
   workflow_dispatch:
 
 permissions:
@@ -23,6 +24,12 @@ permissions:
   checks: write
 
 jobs:
+  version:
+    name: Get Version
+    uses: ./.github/workflows/_version.yml
+    with:
+      gitversion-config: Identity/src/FrontendMentor.InvoiceApp.Identity.Api/GitVersion.yml
+
   shared-development:
     name: Deploy Shared Infrastructure (Development)
     uses: ./.github/workflows/_shared.yml
@@ -30,19 +37,34 @@ jobs:
       environment: Development
     secrets:
         AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
+
   build-development:
     name: Build Identity API
-    needs: shared-development
+    needs: [version, shared-development]
     uses: ./.github/workflows/_build.yml
     with:
       environment: Development
       apiName: invoice-app-identity-api
-      gitversion-config: Identity/src/FrontendMentor.InvoiceApp.Identity.Api/GitVersion.yml
       context: .
       dockerfile: Identity/src/FrontendMentor.InvoiceApp.Identity.Api/Dockerfile
+      image-tag: ${{ needs.version.outputs.image-tag }}
       ecr-registry: ${{ needs.shared-development.outputs.ecr-registry }}
       build-configuration: Release
       dotnet_version: 10.x
       api_test_filter: "FullyQualifiedName~FrontendMentor.InvoiceApp.Identity"
+    secrets:
+        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
+
+  build-migrations-development:
+    name: Build Identity API Migrations Image
+    needs: [version, shared-development]
+    uses: ./.github/workflows/_build-migrations.yml
+    with:
+      environment: Development
+      apiName: invoice-app-identity-api
+      context: .
+      dockerfile: Identity/src/FrontendMentor.InvoiceApp.Identity.Api/Dockerfile.migrations
+      image-tag: ${{ needs.version.outputs.image-tag }}
+      ecr-registry: ${{ needs.shared-development.outputs.ecr-registry }}
     secrets:
         AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
