@@ -20,7 +20,7 @@ if (dbSecretJson is not null)
 {
     var secret = JsonSerializer.Deserialize<DbSecret>(dbSecretJson)!;
     configuration[$"ConnectionStrings:{Databases.AuthDb}"] =
-        $"Server={secret.Host},{secret.Port}; Database={Databases.AuthDb};" +
+        $"Server={secret.Host},{secret.Port}; Database={secret.Database};" +
         $"User Id={secret.Username};Password={secret.Password};TrustServerCertificate=true";
 }
 
@@ -70,4 +70,6 @@ internal sealed record DbSecret
     public required string Username { get; init; }
     [JsonPropertyName("password")]
     public required string Password { get; init; }
+    [JsonPropertyName("databaseInstanceIdentifier")]
+    public required string Database { get; init; }
 }

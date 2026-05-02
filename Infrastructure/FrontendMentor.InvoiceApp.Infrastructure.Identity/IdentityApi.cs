@@ -153,27 +153,26 @@ public sealed class IdentityApi : Construct
                 Family = $"invoice-app-identity-api-migration-{config.Environment}"
             });
 
-        var host = props.DatabaseSecret.SecretValueFromJson("host").UnsafeUnwrap();
-        var port = props.DatabaseSecret.SecretValueFromJson("port").UnsafeUnwrap();
-        var user = props.DatabaseSecret.SecretValueFromJson("username").UnsafeUnwrap();
-        var pass = props.DatabaseSecret.SecretValueFromJson("password").UnsafeUnwrap();
-        var name = props.DatabaseSecret.SecretValueFromJson("dbInstanceIdentifier").UnsafeUnwrap();
-        var connectionString =
-            $"Server={host},{port};Database={name};User Id={user};Password={pass};TrustServerCertificate=True";
-
         migrationTaskDef.AddContainer($"invoice-app-identity-api-migration-{config.Environment}",
             new ContainerDefinitionOptions
             {
                 Image = ContainerImage.FromEcrRepository(migrationsRepo, config.MigrationTag),
                 Essential = true,
+                Secrets = new Dictionary<string, Secret>
+                {
+                    ["DB_HOST"] = Secret.FromSecretsManager(props.DatabaseSecret!, "host"),
+                    ["DB_PORT"] = Secret.FromSecretsManager(props.DatabaseSecret!, "port"),
+                    ["DB_USER"] = Secret.FromSecretsManager(props.DatabaseSecret!, "username"),
+                    ["DB_PASS"] = Secret.FromSecretsManager(props.DatabaseSecret!, "password"),
+                    ["DB_NAME"] = Secret.FromSecretsManager(props.DatabaseSecret!, "dbInstanceIdentifier")
+                },
                 Logging = LogDrivers.AwsLogs(new AwsLogDriverProps
                 {
                     StreamPrefix = $"invoice-app-identity-api-migrations-{config.Environment}",
                     Mode = AwsLogDriverMode.NON_BLOCKING,
                     MaxBufferSize = Size.Mebibytes(25)
                 })
-            })
-            .AddEnvironment("ConnectionStrings__Default", connectionString);
+            });
 
         var targetGroup = new ApplicationTargetGroup(this, "invoice-app-identity-api-target-group",
             new ApplicationTargetGroupProps
