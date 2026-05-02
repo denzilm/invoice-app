@@ -6,7 +6,7 @@ on:
       - main
       - develop
       - release/*
-    tags: ['v*.*.*']
+    tags: ['*.*.*']
     paths:
       - Aspire/**
       - Identity/**
@@ -15,6 +15,7 @@ on:
       - .github/workflows/identity-api.yml
       - .github/workflows/_shared.yml
       - .github/workflows/_build.yml
+      - .github/workflows/_build-migrations.yml
   workflow_dispatch:
 
 permissions:
@@ -30,6 +31,7 @@ jobs:
       environment: Development
     secrets:
         AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
+
   build-development:
     name: Build Identity API
     needs: shared-development
@@ -44,5 +46,19 @@ jobs:
       build-configuration: Release
       dotnet_version: 10.x
       api_test_filter: "FullyQualifiedName~FrontendMentor.InvoiceApp.Identity"
+    secrets:
+        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
+
+  build-migrations-development:
+    name: Build Identity API Migrations Image
+    needs: shared-development
+    uses: ./.github/workflows/_build-migrations.yml
+    with:
+      environment: Development
+      apiName: invoice-app-identity-api
+      context: .
+      dockerfile: Identity/src/FrontendMentor.InvoiceApp.Identity.Api/Dockerfile.migrations
+      ecr-registry: ${{ needs.shared-development.outputs.ecr-registry }}
+      image-tag: ${{ needs.build-development.outputs.image-tag }}
     secrets:
         AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}

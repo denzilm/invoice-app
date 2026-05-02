@@ -8,8 +8,21 @@ patch-version-bump-message: '^(fix|patch|chore|build|ci)'
 branches:
   main:
     label: ''
+    increment: Patch
+  develop:
+    label: 'beta'
+    increment: Minor
   feature:
-    regex: '^.*'
+    regex: '^(feature|feat)[/-]'
     label: 'preview'
+    increment: Inherit       # inherits from develop
+  release:
+    regex: '^release[/-]'
+    label: 'rc'
+    increment: None          # version is set by the release branch name
+  hotfix:
+    regex: '^hotfix[/-]'
+    label: 'hotfix'
+    increment: Patch
   pull-request:
     label: 'pr'
