@@ -132,6 +132,7 @@ public sealed class IdentityApi : Construct
 
         var service = new FargateService(this, "invoice-app-identity-api-service", new FargateServiceProps
         {
+            ServiceName = $"invoice-app-identity-api-{config.Environment}",
             Cluster = props.Cluster,
             TaskDefinition = taskDefinition,
             DesiredCount = config.IsInitialDeploy ? 0 : config.Environment == "Production" ? 2 : 1,
