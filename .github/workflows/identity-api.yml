@@ -41,7 +41,7 @@ jobs:
 
   deploy-identity-api-stack-development:
     name: Deploy Identity API Stack (Development)
-    needs: [ shared-development ]
+    needs: [ version, shared-development ]
     uses: ./.github/workflows/_deploy-service-stack.yml
     with:
       environment: Development
