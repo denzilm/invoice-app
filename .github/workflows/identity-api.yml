@@ -46,6 +46,7 @@ jobs:
       environment: Development
       apiName: invoice-app-identity-api
       service-stack-directory: Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Identity
+      cluster: ${{ needs.shared-development.outputs.cluster-name }}
     secrets:
       AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
 
