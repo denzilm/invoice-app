@@ -5,12 +5,13 @@ using Environment = Amazon.CDK.Environment;
 
 var app = new App();
 
-var env = System.Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "dev";
+var env = System.Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "development";
 var config = new AppConfig(env)
 {
     ImageTag = System.Environment.GetEnvironmentVariable("IMAGE_TAG") ?? "latest",
     MigrationTag = System.Environment.GetEnvironmentVariable("MIGRATION_TAG") ?? "latest",
-    GitCommit = System.Environment.GetEnvironmentVariable("GIT_COMMIT") ?? "unknown"
+    GitCommit = System.Environment.GetEnvironmentVariable("GIT_COMMIT") ?? "unknown",
+    IsInitialDeploy = System.Environment.GetEnvironmentVariable("INITIAL_DEPLOY") == "true"
 };
 
 var stack = new IdentityStack(app, $"invoice-app-identity-{env}", config, new StackProps

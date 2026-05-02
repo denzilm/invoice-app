@@ -24,4 +24,4 @@ RUN dotnet ef migrations bundle \
 
 FROM mcr.microsoft.com/dotnet/runtime-deps:10.0
 COPY --from=build /migrations/migrate /migrate
-ENTRYPOINT ["/migrate"]
+ENTRYPOINT ["/bin/sh", "-c", "exec /migrate --connection \"Server=$DB_HOST,$DB_PORT;Database=$DB_NAME;User Id=$DB_USER;Password=$DB_PASS;TrustServerCertificate=True\""]
