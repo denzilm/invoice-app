@@ -47,14 +47,14 @@ jobs:
           aws-region: ap-southeast-2
 
       - name: CDK Deploy
-          working-directory: ${{ inputs.service-stack-directory }}
-          run: |
-            cdk deploy --require-approval never
-          env:
-            IMAGE_TAG: ${{ inputs.image-tag }}
-            GIT_COMMIT: ${{ inputs.git-commit }}
-            ENVIRONMENT: ${{ inputs.environment }}
-            INITIAL_DEPLOY: false
+        working-directory: ${{ inputs.service-stack-directory }}
+        run: |
+          cdk deploy --require-approval never
+        env:
+          IMAGE_TAG: ${{ inputs.image-tag }}
+          GIT_COMMIT: ${{ inputs.git-commit }}
+          ENVIRONMENT: ${{ inputs.environment }}
+          INITIAL_DEPLOY: false
 
       - name: Wait for service stability
         run: |
