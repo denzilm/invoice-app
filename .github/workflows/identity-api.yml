@@ -32,6 +32,7 @@ jobs:
       gitversion-config: Identity/src/FrontendMentor.InvoiceApp.Identity.Api/GitVersion.yml
 
   shared-development:
+    if: github.ref == 'refs/heads/develop'
     name: Deploy Shared Infrastructure (Development)
     uses: ./.github/workflows/_shared.yml
     with:
