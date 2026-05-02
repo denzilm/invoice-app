@@ -1,0 +1,67 @@
+﻿name: Run Migrations
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      apiName:
+        required: true
+        type: string
+      cluster:
+        required: true
+        type: string
+    secrets:
+        AWS_ROLE_ARN:
+            required: true
+jobs:
+  migrate:
+    name: Run Migrations for ${{ inputs.apiName }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ap-southeast-2
+
+      - name: Fetch Network Config from SSM
+        id: network
+        run: |
+          echo "subnet-ids=$(aws ssm get-parameter \
+            --name /invoice-app/${{ inputs.environment }}/network/private-subnet-ids \
+            --query 'Parameter.Value' \
+            --output text)" >> $GITHUB_OUTPUT
+          echo "sg-id=$(aws ssm get-parameter \
+            --name /invoice-app/${{ inputs.environment }}/network/migration-sg-id \
+            --query 'Parameter.Value' \
+            --output text)" >> $GITHUB_OUTPUT
+
+      - name: Run Migrations
+        run: |
+          TASK_ARN=$(aws ecs run-task \
+            --cluster ${{ inputs.cluster }} \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[${{ steps.network.outputs.subnet-ids }}],securityGroups=[${{ steps.network.outputs.sg-id }}],assignPublicIp=DISABLED}" \
+            --task-definition ${{ inputs.apiName }}-migration-${{ inputs.environment }} \
+            --query 'tasks[0].taskArn' \
+            --output text)
+          
+          echo "Migration Task ARN: $TASK_ARN"
+          
+          aws ecs wait tasks-stopped --cluster ${{ inputs.cluster }} --tasks $TASK_ARN
+          
+          EXIT_CODE=$(aws ecs describe-tasks \
+            --cluster ${{ inputs.cluster }} \
+            --tasks $TASK_ARN \
+            --query 'tasks[0].containers[0].exitCode' \
+            --output text)
+          
+          echo "Migration Task Exit Code: $EXIT_CODE"
+          
+          exit $EXIT_CODE

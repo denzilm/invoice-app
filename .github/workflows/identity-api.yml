@@ -38,6 +38,18 @@ jobs:
     secrets:
         AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
 
+  deploy-identity-api-stack-development:
+    name: Deploy Identity API Stack (Development)
+    needs: [ shared-development ]
+    uses: ./.github/workflows/_deploy-service-stack.yml
+    with:
+      environment: Development
+      apiName: invoice-app-identity-api
+      service-stack-directory: Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Identity
+      cluster: ${{ needs.shared-development.outputs.cluster-name }}
+    secrets:
+      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
+
   build-development:
     name: Build Identity API
     needs: [version, shared-development]
@@ -66,5 +78,16 @@ jobs:
       dockerfile: Identity/src/FrontendMentor.InvoiceApp.Identity.Api/Dockerfile.migrations
       image-tag: ${{ needs.version.outputs.image-tag }}
       ecr-registry: ${{ needs.shared-development.outputs.ecr-registry }}
+    secrets:
+        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
+
+  migrate-development:
+    name: Run Identity API Migrations
+    needs: [shared-development, deploy-identity-api-stack-development, build-migrations-development]
+    uses: ./.github/workflows/_migrate.yml
+    with:
+      environment: Development
+      apiName: invoice-app-identity-api
+      cluster: ${{ needs.shared-development.outputs.cluster-name }}
     secrets:
         AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}

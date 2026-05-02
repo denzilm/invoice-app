@@ -130,11 +130,11 @@ public sealed class IdentityApi : Construct
             }
         });
 
-        var service = new FargateService(this, "invoice-app-identity-api", new FargateServiceProps
+        var service = new FargateService(this, "invoice-app-identity-api-service", new FargateServiceProps
         {
             Cluster = props.Cluster,
             TaskDefinition = taskDefinition,
-            DesiredCount = 1,
+            DesiredCount = config.IsInitialDeploy ? 0 : config.Environment == "Production" ? 2 : 1,
             AssignPublicIp = false,
             VpcSubnets = new SubnetSelection
             {
@@ -160,7 +160,11 @@ public sealed class IdentityApi : Construct
                 Essential = true,
                 Secrets = new Dictionary<string, Secret>
                 {
-                    ["ConnectionStrings__Default"] = Secret.FromSecretsManager(props.DatabaseSecret!)
+                    ["DB_HOST"] = Secret.FromSecretsManager(props.DatabaseSecret!, "host"),
+                    ["DB_PORT"] = Secret.FromSecretsManager(props.DatabaseSecret!, "port"),
+                    ["DB_USER"] = Secret.FromSecretsManager(props.DatabaseSecret!, "username"),
+                    ["DB_PASS"] = Secret.FromSecretsManager(props.DatabaseSecret!, "password"),
+                    ["DB_NAME"] = Secret.FromSecretsManager(props.DatabaseSecret!, "dbInstanceIdentifier")
                 },
                 Logging = LogDrivers.AwsLogs(new AwsLogDriverProps
                 {
