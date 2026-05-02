@@ -134,7 +134,7 @@ public sealed class IdentityApi : Construct
         {
             Cluster = props.Cluster,
             TaskDefinition = taskDefinition,
-            DesiredCount = 1,
+            DesiredCount = config.IsInitialDeploy ? 0 : config.Environment == "Production" ? 2 : 1,
             AssignPublicIp = false,
             VpcSubnets = new SubnetSelection
             {

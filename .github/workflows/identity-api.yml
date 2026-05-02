@@ -79,3 +79,14 @@ jobs:
       ecr-registry: ${{ needs.shared-development.outputs.ecr-registry }}
     secrets:
         AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
+
+  migrate-development:
+    name: Run Identity API Migrations
+    needs: [deploy-identity-api-stack-development, build-migrations-development]
+    uses: ./.github/workflows/_migrate.yml
+    with:
+      environment: Development
+      apiName: invoice-app-identity-api
+      cluster: ${{ needs.shared-development.outputs.cluster-name }}
+    secrets:
+        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
