@@ -109,3 +109,83 @@ jobs:
       git-commit: ${{ github.sha }}
     secrets:
         AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
+
+    shared-staging:
+      if: startsWith(github.ref, 'refs/heads/release/')
+      needs: deploy-identity-api-development
+      name: Deploy Shared Infrastructure (Staging)
+      uses: ./.github/workflows/_shared.yml
+      with:
+        environment: Staging
+      secrets:
+        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_STG }}
+
+    deploy-identity-api-stack-staging:
+      name: Deploy Identity API Stack (Staging)
+      needs: [ version, shared-staging ]
+      uses: ./.github/workflows/_deploy-service-stack.yml
+      with:
+        environment: Staging
+        apiName: invoice-app-identity-api
+        service-stack-directory: Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Identity
+        cluster: ${{ needs.shared-staging.outputs.cluster-name }}
+        image-tag: ${{ needs.version.outputs.image-tag }}
+        git-commit: ${{ github.sha }}
+      secrets:
+        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_STG }}
+
+    build-staging:
+      name: Build Identity API
+      needs: [ version, shared-staging ]
+      uses: ./.github/workflows/_build.yml
+      with:
+        environment: Staging
+        apiName: invoice-app-identity-api
+        context: .
+        dockerfile: Identity/src/FrontendMentor.InvoiceApp.Identity.Api/Dockerfile
+        image-tag: ${{ needs.version.outputs.image-tag }}
+        ecr-registry: ${{ needs.shared-staging.outputs.ecr-registry }}
+        build-configuration: Release
+        dotnet_version: 10.x
+        api_test_filter: "FullyQualifiedName~FrontendMentor.InvoiceApp.Identity"
+      secrets:
+        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_STG }}
+
+    build-migrations-staging:
+      name: Build Identity API Migrations Image
+      needs: [ version, shared-staging ]
+      uses: ./.github/workflows/_build-migrations.yml
+      with:
+        environment: Staging
+        apiName: invoice-app-identity-api
+        context: .
+        dockerfile: Identity/src/FrontendMentor.InvoiceApp.Identity.Api/Dockerfile.migrations
+        image-tag: ${{ needs.version.outputs.image-tag }}
+        ecr-registry: ${{ needs.shared-staging.outputs.ecr-registry }}
+      secrets:
+        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_STG }}
+
+    migrate-staging:
+      name: Run Identity API Migrations
+      needs: [ shared-staging, deploy-identity-api-stack-staging, build-migrations-staging ]
+      uses: ./.github/workflows/_migrate.yml
+      with:
+        environment: Staging
+        apiName: invoice-app-identity-api
+        cluster: ${{ needs.shared-staging.outputs.cluster-name }}
+      secrets:
+        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_STG }}
+
+    deploy-identity-api-staging:
+      name: Deploy Identity API (Development)
+      needs: [ version, shared-staging, migrate-staging ]
+      uses: ./.github/workflows/_deploy-service.yml
+      with:
+        environment: Staging
+        apiName: invoice-app-identity-api
+        service-stack-directory: Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Identity
+        cluster: ${{ needs.shared-staging.outputs.cluster-name }}
+        image-tag: ${{ needs.version.outputs.image-tag }}
+        git-commit: ${{ github.sha }}
+      secrets:
+        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_STG }}
