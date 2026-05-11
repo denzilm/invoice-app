@@ -6,17 +6,8 @@ on:
       - main
       - develop
       - release/*
+      - hotfix/*
     tags: ['*.*.*']
-    paths:
-      - Aspire/**
-      - Identity/**
-      - Shared/**
-      - Infrastructure/**
-      - .github/workflows/identity-api.yml
-      - .github/workflows/_shared.yml
-      - .github/workflows/_build.yml
-      - .github/workflows/_build-migrations.yml
-      - .github/workflows/_deploy-service.yml
   workflow_dispatch:
 
 permissions:
@@ -25,14 +16,54 @@ permissions:
   checks: write
 
 jobs:
+  check-paths:
+    runs-on: ubuntu-latest
+    outputs:
+      should-run: ${{ steps.filter.outputs.changed || steps.bypass.outputs.bypass }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check changed paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            changed:
+              - 'src/ServiceA/**'
+              - 'src/Shared/**'
+              - 'infra/ServiceA/**'
+              - 'infra/Shared/**'
+              - '.github/workflows/service-a.yml'
+              - '.github/workflows/_shared.yml'
+              - '.github/workflows/_build.yml'
+              - '.github/workflows/_build-migrations.yml'
+              - '.github/workflows/_migrate.yml'
+              - '.github/workflows/_deploy.yml'
+              - '.github/workflows/_version.yml'
+
+      # Always run on release, hotfix branches and tags regardless of changed files
+      - name: Bypass path filter
+        id: bypass
+        run: |
+          if [[ "${{ github.ref }}" == refs/heads/release/* ]] || \
+             [[ "${{ github.ref }}" == refs/heads/hotfix/* ]] || \
+             [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            echo "bypass=true" >> $GITHUB_OUTPUT
+          else
+            echo "bypass=false" >> $GITHUB_OUTPUT
+          fi
   version:
     name: Get Version
+    needs: check-paths
     uses: ./.github/workflows/_version.yml
     with:
       gitversion-config: Identity/src/FrontendMentor.InvoiceApp.Identity.Api/GitVersion.yml
 
   shared-development:
-    if: github.ref == 'refs/heads/develop'
+    needs: check-paths
+    if: |
+      needs.check-paths.outputs.should-run == 'true' &&
+      github.ref_name == 'develop'
     name: Deploy Shared Infrastructure (Development)
     uses: ./.github/workflows/_shared.yml
     with:
@@ -111,8 +142,10 @@ jobs:
         AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
 
   shared-staging:
-    if: startsWith(github.ref, 'refs/heads/release/')
-    needs: deploy-identity-api-development
+    needs: check-paths
+    if: |
+      needs.check-paths.outputs.should-run == 'true' &&
+      startsWith(github.ref, 'refs/heads/release/')
     name: Deploy Shared Infrastructure (Staging)
     uses: ./.github/workflows/_shared.yml
     with:
