@@ -16,6 +16,7 @@ on:
       - .github/workflows/_shared.yml
       - .github/workflows/_build.yml
       - .github/workflows/_build-migrations.yml
+      - .github/workflows/_deploy-service.yml
   workflow_dispatch:
 
 permissions:
@@ -31,6 +32,7 @@ jobs:
       gitversion-config: Identity/src/FrontendMentor.InvoiceApp.Identity.Api/GitVersion.yml
 
   shared-development:
+    if: github.ref == 'refs/heads/develop'
     name: Deploy Shared Infrastructure (Development)
     uses: ./.github/workflows/_shared.yml
     with:
@@ -40,13 +42,15 @@ jobs:
 
   deploy-identity-api-stack-development:
     name: Deploy Identity API Stack (Development)
-    needs: [ shared-development ]
+    needs: [ version, shared-development ]
     uses: ./.github/workflows/_deploy-service-stack.yml
     with:
       environment: Development
       apiName: invoice-app-identity-api
       service-stack-directory: Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Identity
       cluster: ${{ needs.shared-development.outputs.cluster-name }}
+      image-tag: ${{ needs.version.outputs.image-tag }}
+      git-commit: ${{ github.sha }}
     secrets:
       AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
 
@@ -89,5 +93,19 @@ jobs:
       environment: Development
       apiName: invoice-app-identity-api
       cluster: ${{ needs.shared-development.outputs.cluster-name }}
+    secrets:
+        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
+
+  deploy-identity-api-development:
+    name: Deploy Identity API (Development)
+    needs: [version, shared-development, migrate-development]
+    uses: ./.github/workflows/_deploy-service.yml
+    with:
+      environment: Development
+      apiName: invoice-app-identity-api
+      service-stack-directory: Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Identity
+      cluster: ${{ needs.shared-development.outputs.cluster-name }}
+      image-tag: ${{ needs.version.outputs.image-tag }}
+      git-commit: ${{ github.sha }}
     secrets:
         AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_DEV }}
