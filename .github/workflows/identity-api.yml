@@ -3,10 +3,7 @@
 on:
   push:
     branches:
-      - main
       - develop
-      - release/*
-    tags: ['*.*.*']
     paths:
       - Aspire/**
       - Identity/**
@@ -17,6 +14,12 @@ on:
       - .github/workflows/_build.yml
       - .github/workflows/_build-migrations.yml
       - .github/workflows/_deploy-service.yml
+  push:
+    branches:
+      - 'release/**'
+      - 'hotfix/**'
+  tags: ['*.*.*']
+
   workflow_dispatch:
 
 permissions:
@@ -112,7 +115,6 @@ jobs:
 
   shared-staging:
     if: startsWith(github.ref, 'refs/heads/release/')
-    needs: deploy-identity-api-development
     name: Deploy Shared Infrastructure (Staging)
     uses: ./.github/workflows/_shared.yml
     with:
