@@ -143,9 +143,9 @@ jobs:
 
   shared-staging:
     needs: check-paths
-      if: |
-        needs.check-paths.outputs.should-run == 'true' &&
-        startsWith(github.ref, 'refs/heads/release/')
+    if: |
+      needs.check-paths.outputs.should-run == 'true' &&
+      startsWith(github.ref, 'refs/heads/release/')
     name: Deploy Shared Infrastructure (Staging)
     uses: ./.github/workflows/_shared.yml
     with:
