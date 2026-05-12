@@ -29,7 +29,21 @@ jobs:
         run: dotnet build --no-restore --configuration ${{ env.BUILD_CONFIGURATION }}
 
       - name: Test
-        run: dotnet test --configuration ${{ env.BUILD_CONFIGURATION }} --no-build --verbosity normal
+        run: dotnet test --configuration ${{ env.BUILD_CONFIGURATION }} --no-build --verbosity normal --logger trx --results-directory ./test-results --collect:"XPlat Code Coverage"
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results
+          path: ./test-results/**/*
+
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v3
+        if: always()
+        with:
+          name: Tests
+          path: ./test-results/**/*.trx
+          reporter: dotnet-trx
 
       - name: Formatting
         run: dotnet format -v detailed --verify-no-changes

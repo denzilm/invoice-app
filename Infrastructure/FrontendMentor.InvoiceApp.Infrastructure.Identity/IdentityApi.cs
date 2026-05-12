@@ -79,16 +79,18 @@ public sealed class IdentityApi : Construct
         }));
 
         var parameters = new Parameters(config);
+        const string repositoryName = "invoice-app-identity-api";
+
         var serviceRepo = Repository.FromRepositoryName(
             this,
-            "invoice-app-identity-api",
-            StringParameter.ValueForStringParameter(this, parameters.EcrIdentityRepositoryName)
+            repositoryName,
+            StringParameter.ValueForStringParameter(this, parameters.GetEcrRepositoryName(repositoryName))
         );
 
         var migrationsRepo = Repository.FromRepositoryName(
             this,
-            "invoice-app-identity-api-migrations",
-            StringParameter.ValueForStringParameter(this, parameters.EcrIdentityMigrationRepositoryName)
+            $"{repositoryName}-migrations",
+            StringParameter.ValueForStringParameter(this, parameters.GetEcrMigrationRepositoryName($"{repositoryName}-migration"))
         );
 
         var taskDefinition = new FargateTaskDefinition(this, "invoice-app-identity-api-task-definition",

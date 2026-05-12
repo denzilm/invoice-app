@@ -15,8 +15,9 @@
     <Project Path="Identity/tests/FrontendMentor.InvoiceApp.Identity.Domain.Tests/FrontendMentor.InvoiceApp.Identity.Domain.Tests.csproj" />
   </Folder>
   <Folder Name="/Infrastructure/">
-    <Project Path="Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Core/FrontendMentor.InvoiceApp.Infrastructure.Core.csproj" />
+    <Project Path="Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Global/FrontendMentor.InvoiceApp.Infrastructure.Global.csproj" />
     <Project Path="Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Identity/FrontendMentor.InvoiceApp.Infrastructure.Identity.csproj" />
+    <Project Path="Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Network/FrontendMentor.InvoiceApp.Infrastructure.Network.csproj" />
     <Project Path="Infrastructure/FrontendMentor.InvoiceApp.Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Shared/" />

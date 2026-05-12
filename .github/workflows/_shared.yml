@@ -46,9 +46,17 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Deploy Shared Stack
+      - name: Deploy Global Stack
         id: cdk
-        working-directory: Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Core
+        working-directory: Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Global
+        run: |
+          cdk deploy --require-approval never --outputs-file cdk-outputs.json
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
+
+      - name: Deploy Network Stack
+        id: cdk
+        working-directory: Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Network
         run: |
           cdk deploy --require-approval never --outputs-file cdk-outputs.json
           echo "cluster-name=$(jq -r '.. | .ClusterName? // empty' cdk-outputs.json)" >> $GITHUB_OUTPUT
