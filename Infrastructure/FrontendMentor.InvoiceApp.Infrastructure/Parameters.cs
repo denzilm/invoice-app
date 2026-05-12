@@ -12,8 +12,8 @@ public sealed record Parameters
 
     public string Network => $"{field}/network";
     public string VpcId => $"{Network}/vpc-id";
-    public string GetEcrRepositoryName(string repository) => $"/{_globalPrefix}/{repository}/repository-name";
-    public string GetEcrMigrationRepositoryName(string repository) => $"/{_globalPrefix}/{repository}/migration/repository-name";
+    public string GetEcrRepositoryName(string repository) => $"{_globalPrefix}/{repository}/repository-name";
+    public string GetEcrMigrationRepositoryName(string repository) => $"{_globalPrefix}/{repository}/migration/repository-name";
     public string ClusterArn => $"{_globalPrefix}/cluster-arn";
     public string ExecutionRoleArn => $"{_globalPrefix}/execution-role-arn";
 }
