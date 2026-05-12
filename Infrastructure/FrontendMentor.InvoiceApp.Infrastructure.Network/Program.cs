@@ -8,9 +8,9 @@ var app = new App();
 var env = System.Environment.GetEnvironmentVariable("ENVIRONMENT") ?? "dev";
 var config = new AppConfig(env);
 
-var stack = new InvoiceAppStack(app, $"invoice-app-{env}", config, new StackProps
+var stack = new NetworkStack(app, $"invoice-app-network-{env}", config, new StackProps
 {
-    StackName = $"invoice-app-{env}",
+    StackName = $"invoice-app-network-{env}",
     Env = new Environment
     {
         Account = System.Environment.GetEnvironmentVariable("CDK_DEFAULT_ACCOUNT"),

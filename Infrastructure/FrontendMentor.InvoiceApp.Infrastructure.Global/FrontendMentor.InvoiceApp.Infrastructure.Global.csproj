@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Amazon.CDK.Lib" />
+    <PackageReference Include="Constructs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FrontendMentor.InvoiceApp.Infrastructure\FrontendMentor.InvoiceApp.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
