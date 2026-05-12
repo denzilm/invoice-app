@@ -28,7 +28,7 @@ jobs:
         id-token: write
     outputs:
       ecr-registry: ${{ steps.login-ecr.outputs.registry }}
-      cluster-name: ${{ steps.cdk.outputs.cluster-name }}
+      cluster-name: ${{ steps.network.outputs.cluster-name }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
@@ -47,7 +47,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Deploy Global Stack
-        id: cdk
+        id: global
         working-directory: Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Global
         run: |
           cdk deploy --require-approval never --outputs-file cdk-outputs.json
@@ -55,7 +55,7 @@ jobs:
           ENVIRONMENT: ${{ inputs.environment }}
 
       - name: Deploy Network Stack
-        id: cdk
+        id: network
         working-directory: Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Network
         run: |
           cdk deploy --require-approval never --outputs-file cdk-outputs.json
