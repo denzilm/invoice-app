@@ -1,0 +1,88 @@
+﻿name: Deploy Service
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      apiName:
+        required: true
+        type: string
+      service-stack-directory:
+        required: true
+        type: string
+      cluster:
+        required: true
+        type: string
+      image-tag:
+        required: true
+        type: string
+      git-commit:
+        required: true
+        type: string
+    secrets:
+      AWS_ROLE_ARN:
+        required: true
+
+jobs:
+  deploy:
+    name: Deploy ${{ inputs.apiName }} Service
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Install CDK CLI
+        run: npm install -g aws-cdk
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ap-southeast-2
+
+      - name: CDK Deploy
+        working-directory: ${{ inputs.service-stack-directory }}
+        run: |
+          cdk deploy --require-approval never
+        env:
+          IMAGE_TAG: ${{ inputs.image-tag }}
+          GIT_COMMIT: ${{ inputs.git-commit }}
+          ENVIRONMENT: ${{ inputs.environment }}
+          INITIAL_DEPLOY: false
+
+      - name: Wait for service stability
+        run: |
+          aws ecs wait services-stable \
+          --cluster ${{ inputs.cluster }} \
+          --services ${{ inputs.apiName }}-${{ inputs.environment }}
+
+      - name: Verify deployment
+        run: |
+          TASK_DEF=$(aws ecs describe-services \
+            --cluster invoice-app-cluster-${{ inputs.environment }} \
+            --services ${{ inputs.apiName }}-${{ inputs.environment }} \
+            --query 'services[0].taskDefinition' \
+            --output text)
+  
+          if [ -z "$TASK_DEF" ] || [ "$TASK_DEF" = "None" ]; then
+            echo "No task definition found (service may not be ready yet)"
+            exit 1
+          fi
+  
+          RUNNING_IMAGE=$(aws ecs describe-task-definition \
+            --task-definition "$TASK_DEF" \
+            --query 'taskDefinition.containerDefinitions[0].image' \
+            --output text)        
+          
+          echo "Running image: $RUNNING_IMAGE"
+          
+          if [[ "$RUNNING_IMAGE" != *"${{ inputs.image-tag }}"* ]]; then
+            echo "Image tag mismatch — deploy may have rolled back"
+            exit 1
+          fi

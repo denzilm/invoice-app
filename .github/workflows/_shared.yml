@@ -28,7 +28,7 @@ jobs:
         id-token: write
     outputs:
       ecr-registry: ${{ steps.login-ecr.outputs.registry }}
-      cluster-name: ${{ steps.cdk.outputs.cluster-name }}
+      cluster-name: ${{ steps.network.outputs.cluster-name }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
@@ -46,9 +46,17 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Deploy Shared Stack
-        id: cdk
-        working-directory: Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Core
+      - name: Deploy Global Stack
+        id: global
+        working-directory: Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Global
+        run: |
+          cdk deploy --require-approval never --outputs-file cdk-outputs.json
+        env:
+          ENVIRONMENT: ${{ inputs.environment }}
+
+      - name: Deploy Network Stack
+        id: network
+        working-directory: Infrastructure/FrontendMentor.InvoiceApp.Infrastructure.Network
         run: |
           cdk deploy --require-approval never --outputs-file cdk-outputs.json
           echo "cluster-name=$(jq -r '.. | .ClusterName? // empty' cdk-outputs.json)" >> $GITHUB_OUTPUT

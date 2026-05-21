@@ -45,7 +45,7 @@ public sealed class IdentityApi : Construct
         });
         apiSecurityGroup
             .AddIngressRule(
-                Peer.SecurityGroupId(loadBalancerSecurityGroup.SecurityGroupId), Port.HTTP, "Allows HTTP traffic from the load balancer");
+                Peer.SecurityGroupId(loadBalancerSecurityGroup.SecurityGroupId), Port.Tcp(8080), "Allows HTTP traffic from the load balancer");
 
         props.DatabaseSecurityGroup
             .AddIngressRule(
@@ -79,21 +79,24 @@ public sealed class IdentityApi : Construct
         }));
 
         var parameters = new Parameters(config);
+        const string repositoryName = "invoice-app-identity-api";
+
         var serviceRepo = Repository.FromRepositoryName(
             this,
-            "invoice-app-identity-api",
-            StringParameter.ValueForStringParameter(this, parameters.EcrIdentityRepositoryName)
+            repositoryName,
+            StringParameter.ValueForStringParameter(this, parameters.GetEcrRepositoryName(repositoryName))
         );
 
         var migrationsRepo = Repository.FromRepositoryName(
             this,
-            "invoice-app-identity-api-migrations",
-            StringParameter.ValueForStringParameter(this, parameters.EcrIdentityMigrationRepositoryName)
+            $"{repositoryName}-migrations",
+            StringParameter.ValueForStringParameter(this, parameters.GetEcrMigrationRepositoryName($"{repositoryName}-migration"))
         );
 
         var taskDefinition = new FargateTaskDefinition(this, "invoice-app-identity-api-task-definition",
             new FargateTaskDefinitionProps
             {
+                Family = $"invoice-app-identity-api-{config.Environment}",
                 ExecutionRole = props.ExecutionRole,
                 TaskRole = taskRole,
             });
@@ -132,6 +135,7 @@ public sealed class IdentityApi : Construct
 
         var service = new FargateService(this, "invoice-app-identity-api-service", new FargateServiceProps
         {
+            ServiceName = $"invoice-app-identity-api-{config.Environment}",
             Cluster = props.Cluster,
             TaskDefinition = taskDefinition,
             DesiredCount = config.IsInitialDeploy ? 0 : config.Environment == "Production" ? 2 : 1,
