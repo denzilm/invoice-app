@@ -226,7 +226,7 @@ jobs:
   shared-production:
     needs: check-paths
     if: |
-      needs.check-paths.outputs.should-run == 'true' && github.ref_name == 'develop'
+      needs.check-paths.outputs.should-run == 'true' && github.ref_name == 'main'
     name: Deploy Shared Infrastructure (Production)
     uses: ./.github/workflows/_shared.yml
     with:
@@ -291,7 +291,7 @@ jobs:
       AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN_PROD }}
 
   deploy-identity-api-production:
-    name: Deploy Identity API (Development)
+    name: Deploy Identity API (Production)
     needs: [ version, shared-production, migrate-production ]
     uses: ./.github/workflows/_deploy-service.yml
     with:
