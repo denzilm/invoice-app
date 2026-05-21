@@ -1,5 +1,5 @@
 {
-  "app": "dotnet run --project FrontendMentor.InvoiceApp.Infrastructure.Core.csproj",
+  "app": "dotnet run --project FrontendMentor.InvoiceApp.Infrastructure.Global.csproj",
   "watch": {
     "include": [
       "**"

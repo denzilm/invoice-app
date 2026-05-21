@@ -2,17 +2,18 @@
 
 public sealed record Parameters
 {
-    private readonly string _parameterPrefix;
+    private readonly string _globalPrefix;
 
     public Parameters(AppConfig config)
     {
-        _parameterPrefix = $"/{AppConfig.AppName}/{config.Environment}";
+        Network = $"/{AppConfig.AppName}/{config.Environment}";
+        _globalPrefix = $"/{AppConfig.AppName}";
     }
 
-    public string Network => $"{_parameterPrefix}/network";
+    public string Network => $"{field}/network";
     public string VpcId => $"{Network}/vpc-id";
-    public string EcrIdentityRepositoryName => $"{_parameterPrefix}/identity/repository-name";
-    public string EcrIdentityMigrationRepositoryName => $"{_parameterPrefix}/identity/migration/repository-name";
-    public string ClusterArn => $"{_parameterPrefix}/cluster-arn";
-    public string ExecutionRoleArn => $"{_parameterPrefix}/execution-role-arn";
+    public string GetEcrRepositoryName(string repository) => $"{_globalPrefix}/{repository}/repository-name";
+    public string GetEcrMigrationRepositoryName(string repository) => $"{_globalPrefix}/{repository}/migration/repository-name";
+    public string ClusterArn => $"{_globalPrefix}/cluster-arn";
+    public string ExecutionRoleArn => $"{_globalPrefix}/execution-role-arn";
 }
