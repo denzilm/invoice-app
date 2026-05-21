@@ -65,7 +65,7 @@ jobs:
       - name: Verify deployment
         run: |
           TASK_DEF=$(aws ecs describe-services \
-            --cluster invoice-app-cluster-Development \
+            --cluster invoice-app-cluster-${{ inputs.environment }} \
             --services ${{ inputs.apiName }}-${{ inputs.environment }} \
             --query 'services[0].taskDefinition' \
             --output text)
