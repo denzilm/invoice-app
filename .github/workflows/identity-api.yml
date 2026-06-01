@@ -32,7 +32,7 @@ jobs:
               - 'Identity/**'
               - 'Shared/**'
               - 'Infrastructure/**'
-              - '.github/workflows/service-a.yml'
+              - '.github/workflows/identity-api.yml'
               - '.github/workflows/_shared.yml'
               - '.github/workflows/_build.yml'
               - '.github/workflows/_build-migrations.yml'
