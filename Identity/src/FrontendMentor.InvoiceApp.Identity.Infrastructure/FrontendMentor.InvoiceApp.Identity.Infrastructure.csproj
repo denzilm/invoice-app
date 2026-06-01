@@ -5,4 +5,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FrontendMentor.InvoiceApp.Identity.Domain\FrontendMentor.InvoiceApp.Identity.Domain.csproj" />
+  </ItemGroup>
 </Project>

@@ -8,6 +8,7 @@ var sqlServer = builder.AddSqlServer("sql", sqlAdminPassword)
     .WithDataVolume("sql_data");
 
 var authDb = sqlServer.AddDatabase(Databases.AuthDb);
+var identityAppDb = sqlServer.AddDatabase(Databases.IdentityAppDb);
 
 var redisPassword = builder.AddParameter("RedisPassword", secret: true);
 var cache = builder.AddRedis(Caches.AppCache, password: redisPassword)
@@ -18,12 +19,15 @@ var cache = builder.AddRedis(Caches.AppCache, password: redisPassword)
 
 var identityMigrator = builder.AddProject<Projects.IdentityMigrator>(Migrators.IdentityMigrator)
     .WithReference(authDb)
+    .WithReference(identityAppDb)
     .WaitFor(authDb)
+    .WaitFor(identityAppDb)
     .WithParentRelationship(sqlServer)
     .ExcludeFromManifest();
 
 builder.AddProject<Projects.IdentityApi>(Apis.IdentityApi)
     .WithReference(authDb)
+    .WithReference(identityAppDb)
     .WithReference(identityMigrator)
     .WithReference(cache)
     .WaitFor(identityMigrator)

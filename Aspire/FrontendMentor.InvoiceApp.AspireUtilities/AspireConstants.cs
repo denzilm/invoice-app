@@ -15,6 +15,7 @@ public static class AspireConstants
     public static class Databases
     {
         public const string AuthDb = "AuthDb";
+        public const string IdentityAppDb = "IdentityAppDb";
     }
 
     public static class Migrators

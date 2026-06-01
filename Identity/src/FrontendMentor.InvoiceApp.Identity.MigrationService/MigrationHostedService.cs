@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using FrontendMentor.InvoiceApp.Identity.Infrastructure.AppPersistence;
 using FrontendMentor.InvoiceApp.Identity.Infrastructure.IdentityPersistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,8 +27,10 @@ public sealed class MigrationHostedService : BackgroundService
         {
             using var scope = _serviceProvider.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+            var appDbContext = scope.ServiceProvider.GetRequiredService<IdentityAppDbContext>();
 
             await RunMigrationsAsync(dbContext, stoppingToken);
+            await RunMigrationsAsync(appDbContext, stoppingToken);
         }
         catch (Exception ex)
         {
@@ -38,7 +41,7 @@ public sealed class MigrationHostedService : BackgroundService
         _applicationLifetime.StopApplication();
     }
 
-    private static async Task RunMigrationsAsync(AuthDbContext dbContext, CancellationToken stoppingToken)
+    private static async Task RunMigrationsAsync(DbContext dbContext, CancellationToken stoppingToken)
     {
         var strategy = dbContext.Database.CreateExecutionStrategy();
         await strategy.ExecuteAsync(dbContext, static (context, ct) => context.Database.MigrateAsync(ct), stoppingToken);
