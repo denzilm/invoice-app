@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using FrontendMentor.InvoiceApp.Identity.Infrastructure;
+using FrontendMentor.InvoiceApp.Identity.Infrastructure.AppPersistence;
 using FrontendMentor.InvoiceApp.Identity.Infrastructure.IdentityPersistence;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
@@ -25,6 +26,7 @@ if (dbSecretJson is not null)
 }
 
 builder.AddSqlServerDbContext<AuthDbContext>(Databases.AuthDb);
+builder.AddSqlServerDbContext<IdentityAppDbContext>(Databases.IdentityAppDb);
 services.AddProblemDetails();
 services.AddIdentityServices();
 var dataProtection = services

@@ -167,8 +167,12 @@ public sealed class IdentityApi : Construct
                     ["DB_HOST"] = Secret.FromSecretsManager(props.DatabaseSecret!, "host"),
                     ["DB_PORT"] = Secret.FromSecretsManager(props.DatabaseSecret!, "port"),
                     ["DB_USER"] = Secret.FromSecretsManager(props.DatabaseSecret!, "username"),
-                    ["DB_PASS"] = Secret.FromSecretsManager(props.DatabaseSecret!, "password"),
-                    ["DB_NAME"] = Secret.FromSecretsManager(props.DatabaseSecret!, "dbInstanceIdentifier")
+                    ["DB_PASS"] = Secret.FromSecretsManager(props.DatabaseSecret!, "password")
+                },
+                Environment = new Dictionary<string, string>
+                {
+                    ["AUTH_DB_NAME"] = "IdentityAuth",
+                    ["IDENTITY_DB_NAME"] = "IdentityApp"
                 },
                 Logging = LogDrivers.AwsLogs(new AwsLogDriverProps
                 {
