@@ -59,18 +59,7 @@ public sealed class Storage : Construct
             })
         });
 
-        var databaseEndPointParameter = new StringParameter(
-            this,
-            $"invoice-app-identity-database-endpoint-parameter-{config.Environment}",
-            new StringParameterProps
-            {
-                ParameterName = $"/{AppConfig.AppName}/{config.Environment}/identity-database-endpoint",
-                StringValue = databaseInstance.DbInstanceEndpointAddress,
-                Description = "Database endpoint for the identity database"
-            });
-
         DatabaseSecret = databaseInstance.Secret;
-        DatabaseEndPoint = databaseEndPointParameter;
         DatabaseSecurityGroup = databaseSecurityGroup;
 
         _ = new StringParameter(this, "invoice-app-identity-database-migration-param", new StringParameterProps
@@ -82,6 +71,5 @@ public sealed class Storage : Construct
     }
 
     public ISecret? DatabaseSecret { get; }
-    public IStringParameter DatabaseEndPoint { get; }
     public ISecurityGroup DatabaseSecurityGroup { get; }
 }

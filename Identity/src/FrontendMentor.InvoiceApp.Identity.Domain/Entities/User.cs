@@ -1,18 +1,22 @@
-﻿using FrontendMentor.InvoiceApp.Shared.Common;
+﻿using FrontendMentor.InvoiceApp.Identity.Domain.Enums;
+using FrontendMentor.InvoiceApp.Shared.Common;
 using FrontendMentor.InvoiceApp.Shared.Domain;
 
 namespace FrontendMentor.InvoiceApp.Identity.Domain.Entities;
 
 public sealed class User : EntityBase<Guid>
 {
-    private User(Guid id, string firstName, string lastName, EmailAddress emailAddress, PhoneNumber phoneNumber, string avatarUrl)
-        : base(id)
+    private User(
+        Guid id, string firstName, string lastName, EmailAddress emailAddress, PhoneNumber phoneNumber,
+        string avatarUrl, UserStatusEnum status, DateTimeOffset createdAt) : base(id)
     {
         FirstName = firstName;
         LastName = lastName;
         EmailAddress = emailAddress;
         PhoneNumber = phoneNumber;
         AvatarUrl = avatarUrl;
+        Status = status;
+        CreatedAt = createdAt;
     }
 
     public string FirstName { get; private set; }
@@ -20,6 +24,8 @@ public sealed class User : EntityBase<Guid>
     public EmailAddress EmailAddress { get; private set; }
     public PhoneNumber PhoneNumber { get; private set; }
     public string AvatarUrl { get; private set; }
+    public UserStatusEnum Status { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; }
 
     private readonly List<UserIdentity> _userIdentities = [];
     public IReadOnlyList<UserIdentity> UserIdentities => _userIdentities.AsReadOnly();
@@ -46,7 +52,7 @@ public sealed class User : EntityBase<Guid>
         if (!Uri.TryCreate(avatarUrl, UriKind.Absolute, out _))
             throw new ArgumentException("Avatar URL must be a valid absolute URI", nameof(avatarUrl));
 
-        return new User(Guid.Empty, trimmedFirstName, trimmedLastName, emailAddress, phoneNumber, avatarUrl);
+        return new User(Guid.CreateVersion7(), trimmedFirstName, trimmedLastName, emailAddress, phoneNumber, avatarUrl, UserStatusEnum.Active, DateTimeOffset.UtcNow);
     }
 
     public void LinkIdentity(UserIdentity identity)

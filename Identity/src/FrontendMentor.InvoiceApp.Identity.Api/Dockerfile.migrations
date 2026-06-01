@@ -16,12 +16,25 @@ COPY . .
 
 WORKDIR /src/Identity
 RUN dotnet ef migrations bundle \
+    --context AuthDbContext \
     --project src/FrontendMentor.InvoiceApp.Identity.Infrastructure/FrontendMentor.InvoiceApp.Identity.Infrastructure.csproj \
     --startup-project src/FrontendMentor.InvoiceApp.Identity.Api/FrontendMentor.InvoiceApp.Identity.Api.csproj \
-    --output /migrations/migrate \
+    --output /migrations/migrate-auth \
+    --self-contained \
+    -r linux-x64
+
+RUN dotnet ef migrations bundle \
+    --context IdentityAppDbContext \
+    --project src/FrontendMentor.InvoiceApp.Identity.Infrastructure/FrontendMentor.InvoiceApp.Identity.Infrastructure.csproj \
+    --startup-project src/FrontendMentor.InvoiceApp.Identity.Api/FrontendMentor.InvoiceApp.Identity.Api.csproj \
+    --output /migrations/migrate-identity \
     --self-contained \
     -r linux-x64
 
 FROM mcr.microsoft.com/dotnet/runtime-deps:10.0
-COPY --from=build /migrations/migrate /migrate
-ENTRYPOINT ["/bin/sh", "-c", "exec /migrate --connection \"Server=$DB_HOST,$DB_PORT;Database=$DB_NAME;User Id=$DB_USER;Password=$DB_PASS;TrustServerCertificate=True\""]
+COPY --from=build /migrations/migrate-auth /migrate-auth
+COPY --from=build /migrations/migrate-identity /migrate-identity
+
+ENTRYPOINT ["/bin/sh", "-c", \
+    "exec /migrate-auth --connection \"Server=$DB_HOST,$DB_PORT;Database=$AUTH_DB_NAME;User Id=$DB_USER;Password=$DB_PASS;TrustServerCertificate=True\" && \
+     exec /migrate-identity --connection \"Server=$DB_HOST,$DB_PORT;Database=$IDENTITY_DB_NAME;User Id=$DB_USER;Password=$DB_PASS;TrustServerCertificate=True\""]
