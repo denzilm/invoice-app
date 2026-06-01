@@ -29,10 +29,9 @@ jobs:
         with:
           filters: |
             changed:
-              - 'src/ServiceA/**'
-              - 'src/Shared/**'
-              - 'infra/ServiceA/**'
-              - 'infra/Shared/**'
+              - 'Identity/**'
+              - 'Shared/**'
+              - 'Infrastructure/**'
               - '.github/workflows/service-a.yml'
               - '.github/workflows/_shared.yml'
               - '.github/workflows/_build.yml'
