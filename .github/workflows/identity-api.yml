@@ -1,4 +1,4 @@
-﻿name: Identity API
+name: Identity API
 
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
   check-paths:
     runs-on: ubuntu-latest
     outputs:
-      should-run: ${{ steps.filter.outputs.changed || steps.bypass.outputs.bypass }}
+      should-run: ${{ steps.filter.outputs.changed == 'true' || steps.bypass.outputs.bypass == 'true'}}
     steps:
       - uses: actions/checkout@v4
 
