@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using FrontendMentor.InvoiceApp.Identity.Infrastructure;
 using FrontendMentor.InvoiceApp.Identity.Infrastructure.AppPersistence;
 using FrontendMentor.InvoiceApp.Identity.Infrastructure.IdentityPersistence;
@@ -21,12 +22,6 @@ var dbAppSecretJson = Environment.GetEnvironmentVariable("DB_APP_SECRET");
 var dbSecretJson = Environment.GetEnvironmentVariable("DB_SECRET");
 var authDbName = Environment.GetEnvironmentVariable("AUTH_DB_NAME") ?? "IdentityAuth";
 var identityDbName = Environment.GetEnvironmentVariable("IDENTITY_DB_NAME") ?? "IdentityApp";
-
-Console.WriteLine("DbAuthSecretJSON: " + dbAuthSecretJson);
-Console.WriteLine("DbAppSecretJSON: " + dbAppSecretJson);
-Console.WriteLine("DbSecretJSON: " + dbSecretJson);
-Console.WriteLine("authDbName: " + authDbName);
-Console.WriteLine("identityDbName: " + identityDbName);
 if (dbSecretJson is not null)
 {
     var dbSecret = JsonSerializer.Deserialize<DbSecret>(dbSecretJson)!;
@@ -90,7 +85,10 @@ app.UseExceptionHandler();
 
 app.MapGet("/", (AuthDbContext context) => $"We have currently '{context.Users.ToList().Count}' users");
 
-app.MapHealthChecks("/healthz");
+app.MapHealthChecks("/healthz", new HealthCheckOptions
+{
+    Predicate = healthCheck => healthCheck.Tags.Contains("live")
+});
 
 app.Run();
 
