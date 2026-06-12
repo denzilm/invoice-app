@@ -117,6 +117,11 @@ public sealed class IdentityApi : Construct
             {
                 ["DB_SECRET"] = Secret.FromSecretsManager(props.DatabaseSecret!)
             },
+            Environment = new Dictionary<string, string>
+            {
+                ["AUTH_DB_NAME"] = "IdentityAuth",
+                ["IDENTITY_DB_NAME"] = "IdentityApp"
+            },
             Logging = LogDriver.AwsLogs(new AwsLogDriverProps
             {
                 StreamPrefix = $"invoice-app-identity-api-{config.Environment}",
