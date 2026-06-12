@@ -115,7 +115,11 @@ public sealed class IdentityApi : Construct
             ContainerName = $"invoice-app-identity-api-{config.Environment}",
             Secrets = new Dictionary<string, Secret>
             {
-                ["DB_SECRET"] = Secret.FromSecretsManager(props.DatabaseSecret!)
+                ["DB_SECRET"] = Secret.FromSecretsManager(props.DatabaseSecret!),
+                ["DB_HOST"] = Secret.FromSecretsManager(props.DatabaseSecret!, "host"),
+                ["DB_PORT"] = Secret.FromSecretsManager(props.DatabaseSecret!, "port"),
+                ["DB_USER"] = Secret.FromSecretsManager(props.DatabaseSecret!, "username"),
+                ["DB_PASS"] = Secret.FromSecretsManager(props.DatabaseSecret!, "password")
             },
             Environment = new Dictionary<string, string>
             {
