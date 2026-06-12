@@ -16,13 +16,20 @@ var configuration = builder.Configuration;
 
 builder.AddServiceDefaults();
 
-var dbSecretJson = Environment.GetEnvironmentVariable("DB_SECRET");
-if (dbSecretJson is not null)
+var dbAuthSecretJson = Environment.GetEnvironmentVariable("DB_AUTH_SECRET");
+var dbAppSecretJson = Environment.GetEnvironmentVariable("DB_APP_SECRET");
+if (dbAuthSecretJson is not null && dbAppSecretJson is not null)
 {
-    var secret = JsonSerializer.Deserialize<DbSecret>(dbSecretJson)!;
+    var authSecret = JsonSerializer.Deserialize<DbSecret>(dbAuthSecretJson)!;
+    var appSecret = JsonSerializer.Deserialize<DbSecret>(dbAppSecretJson)!;
+
     configuration[$"ConnectionStrings:{Databases.AuthDb}"] =
-        $"Server={secret.Host},{secret.Port}; Database={secret.Database};" +
-        $"User Id={secret.Username};Password={secret.Password};TrustServerCertificate=true";
+        $"Server={authSecret.Host},{authSecret.Port}; Database={authSecret.Database};" +
+        $"User Id={authSecret.Username};Password={authSecret.Password};TrustServerCertificate=true";
+
+    configuration[$"ConnectionStrings:{Databases.IdentityAppDb}"] =
+        $"Server={appSecret.Host},{appSecret.Port}; Database={appSecret.Database};" +
+        $"User Id={appSecret.Username};Password={appSecret.Password};TrustServerCertificate=true";
 }
 
 builder.AddSqlServerDbContext<AuthDbContext>(Databases.AuthDb);
