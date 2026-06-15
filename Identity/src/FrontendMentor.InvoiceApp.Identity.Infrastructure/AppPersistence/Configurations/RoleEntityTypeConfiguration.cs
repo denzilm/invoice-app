@@ -16,5 +16,9 @@ public sealed class RoleEntityTypeConfiguration : IEntityTypeConfiguration<Role>
         builder.Property(x => x.Status).HasColumnName("StatusId").HasConversion(x => x.Value, x => RoleStatusEnum.FromValue(x)).IsRequired();
 
         builder.HasIndex(r => r.Name, "UQ_Roles_Name").IsUnique();
+
+        builder.HasMany(r => r.RolePermissions).WithOne()
+            .HasForeignKey(rp => rp.RoleId)
+            .OnDelete(DeleteBehavior.ClientSetNull);
     }
 }

@@ -18,5 +18,9 @@ public sealed class PermissionEntityTypeConfiguration : IEntityTypeConfiguration
             .IsRequired();
 
         builder.HasIndex(p => p.Name, "UQ_Permissions_Name").IsUnique();
+
+        builder.HasMany(p => p.RolePermissions).WithOne()
+            .HasForeignKey(rp => rp.PermissionId)
+            .OnDelete(DeleteBehavior.ClientSetNull);
     }
 }
