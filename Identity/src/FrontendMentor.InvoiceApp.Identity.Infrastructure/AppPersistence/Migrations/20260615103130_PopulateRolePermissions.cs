@@ -13,7 +13,7 @@ namespace FrontendMentor.InvoiceApp.Identity.Infrastructure.AppPersistence.Migra
             migrationBuilder.InsertData(
                 table: "RolePermissions",
                 columns: ["RoleId", "PermissionId"],
-                values: new [,]
+                values: new[,]
                 {
                     {"EFA2B0E7-D457-4A93-BDA6-655864906C49", "DF4FA786-2DE7-488D-B75D-42011EE086BF"},
                     {"EFA2B0E7-D457-4A93-BDA6-655864906C49", "5EC5FC3A-E3F0-44D2-81FE-4F5CA1167CEA"},

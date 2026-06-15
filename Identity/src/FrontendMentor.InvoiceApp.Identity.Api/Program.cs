@@ -1,12 +1,12 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using FrontendMentor.InvoiceApp.Identity.Infrastructure;
 using FrontendMentor.InvoiceApp.Identity.Infrastructure.AppPersistence;
 using FrontendMentor.InvoiceApp.Identity.Infrastructure.IdentityPersistence;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.DataProtection.StackExchangeRedis;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 using static FrontendMentor.InvoiceApp.AspireUtilities.AspireConstants;
