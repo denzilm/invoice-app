@@ -20,7 +20,10 @@ public sealed class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.Status).HasColumnName("StatusId").HasConversion(x => x.Value, x => UserStatusEnum.FromValue(x)).IsRequired();
         builder.Property(x => x.CreatedAt).IsRequired();
 
-        builder.HasMany(x => x.UserIdentities).WithOne().HasForeignKey(u => u.UserId).IsRequired();
+        builder.HasMany(x => x.UserIdentities).WithOne()
+            .HasForeignKey(u => u.UserId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.ClientSetNull);
 
         builder.HasIndex(["EmailAddress"], "IX_Users_EmailAddress").IsUnique();
         builder.HasIndex(["Status"], "IX_Users_Status");
