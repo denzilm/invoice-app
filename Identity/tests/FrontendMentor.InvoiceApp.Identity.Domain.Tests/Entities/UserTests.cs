@@ -188,6 +188,242 @@ public class UserTests
         Assert.False(collection is List<UserIdentity>, "Collection should not be the raw list");
     }
 
+    [Fact]
+    public void TryGetValidRefreshToken_ShouldReturnTrue_WhenValidTokenExists()
+    {
+        var user = CreateValidUser();
+        var token = RefreshToken.Create(user.Id, "hash");
+
+        user.AddRefreshToken(token);
+
+        var result = user.TryGetValidRefreshToken("hash", out var found);
+
+        Assert.True(result);
+        Assert.NotNull(found);
+    }
+
+    [Fact]
+    public void TryGetValidRefreshToken_ShouldReturnFalse_WhenTokenDoesNotExist()
+    {
+        var user = CreateValidUser();
+
+        var result = user.TryGetValidRefreshToken("missing", out var found);
+
+        Assert.False(result);
+        Assert.Null(found);
+    }
+
+    [Fact]
+    public void TryGetValidRefreshToken_ShouldReturnFalse_WhenTokenIsRevoked()
+    {
+        var user = CreateValidUser();
+        var token = RefreshToken.Create(user.Id, "hash");
+
+        user.AddRefreshToken(token);
+        user.RevokeRefreshToken("hash");
+
+        var result = user.TryGetValidRefreshToken("hash", out var found);
+
+        Assert.False(result);
+        Assert.Null(found);
+    }
+
+    // -----------------------------
+    // AddRefreshToken
+    // -----------------------------
+
+    [Fact]
+    public void AddRefreshToken_ShouldAddToken()
+    {
+        var user = CreateValidUser();
+        var token = RefreshToken.Create(user.Id, "hash");
+
+        user.AddRefreshToken(token);
+
+        Assert.True(user.TryGetValidRefreshToken("hash", out var found));
+        Assert.NotNull(found);
+    }
+
+    [Fact]
+    public void AddRefreshToken_ShouldThrow_WhenTokenBelongsToDifferentUser()
+    {
+        var user = CreateValidUser();
+        var otherUserId = Guid.NewGuid();
+        var token = RefreshToken.Create(otherUserId, "hash");
+
+        var act = () => user.AddRefreshToken(token);
+
+        var ex = Assert.Throws<InvalidOperationException>(act);
+        Assert.Contains("Refresh token does not belong to this user", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void AddRefreshToken_ShouldThrow_WhenTokenIsExpired()
+    {
+        var user = CreateValidUser();
+        var token = RefreshToken.Create(user.Id, "hash");
+
+        // force expire (hacky but common in unit tests unless you inject time)
+        typeof(RefreshToken)
+            .GetProperty("ExpiresAt")!
+            .SetValue(token, DateTimeOffset.UtcNow.AddDays(-1));
+
+        var act = () => user.AddRefreshToken(token);
+
+        var ex = Assert.Throws<InvalidOperationException>(act);
+        Assert.Contains("Cannot add an expired refresh token.", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void AddRefreshToken_ShouldThrow_WhenDuplicateHashExists()
+    {
+        var user = CreateValidUser();
+
+        var token1 = RefreshToken.Create(user.Id, "hash");
+        var token2 = RefreshToken.Create(user.Id, "hash");
+
+        user.AddRefreshToken(token1);
+
+        var act = () => user.AddRefreshToken(token2);
+
+        var ex = Assert.Throws<InvalidOperationException>(act);
+        Assert.Contains("A refresh token with the same hash already exists for this user.", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    // -----------------------------
+    // RotateRefreshToken
+    // -----------------------------
+
+    [Fact]
+    public void RotateRefreshToken_ShouldRotateToken()
+    {
+        var user = CreateValidUser();
+        var token = RefreshToken.Create(user.Id, "old");
+
+        user.AddRefreshToken(token);
+
+        user.RotateRefreshToken("old", "new");
+
+        Assert.Equal("new", token.TokenHash);
+    }
+
+    [Fact]
+    public void RotateRefreshToken_ShouldThrow_WhenTokenDoesNotExist()
+    {
+        var user = CreateValidUser();
+
+        var act = () => user.RotateRefreshToken("missing", "new");
+
+        var ex = Assert.Throws<InvalidOperationException>(act);
+        Assert.Contains("Refresh token is invalid or does not exist.", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    // -----------------------------
+    // RevokeRefreshToken
+    // -----------------------------
+
+    [Fact]
+    public void RevokeRefreshToken_ShouldRevokeToken()
+    {
+        var user = CreateValidUser();
+        var token = RefreshToken.Create(user.Id, "hash");
+
+        user.AddRefreshToken(token);
+
+        user.RevokeRefreshToken("hash");
+
+        Assert.True(token.IsRevoked);
+    }
+
+    [Fact]
+    public void RevokeRefreshToken_ShouldThrow_WhenTokenDoesNotExist()
+    {
+        var user = CreateValidUser();
+
+        var act = () => user.RevokeRefreshToken("missing");
+
+        var ex = Assert.Throws<InvalidOperationException>(act);
+        Assert.Contains("Refresh token not found.", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void RevokeRefreshToken_ShouldThrow_WhenTokenAlreadyRevoked()
+    {
+        var user = CreateValidUser();
+        var token = RefreshToken.Create(user.Id, "hash");
+
+        user.AddRefreshToken(token);
+
+        user.RevokeRefreshToken("hash");
+
+        var act = () => user.RevokeRefreshToken("hash");
+
+        var ex = Assert.Throws<InvalidOperationException>(act);
+        Assert.Contains("Refresh token is already revoked.", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    // -----------------------------
+    // RevokeAllRefreshTokens
+    // -----------------------------
+
+    [Fact]
+    public void RevokeAllRefreshTokens_ShouldRevokeAllValidTokens()
+    {
+        var user = CreateValidUser();
+
+        var t1 = RefreshToken.Create(user.Id, "h1");
+        var t2 = RefreshToken.Create(user.Id, "h2");
+
+        user.AddRefreshToken(t1);
+        user.AddRefreshToken(t2);
+
+        user.RevokeAllRefreshTokens();
+
+        Assert.True(t1.IsRevoked);
+        Assert.True(t2.IsRevoked);
+    }
+
+    // -----------------------------
+    // RevokeAllRefreshTokensExcept
+    // -----------------------------
+
+    [Fact]
+    public void RevokeAllRefreshTokensExcept_ShouldLeaveSpecifiedTokenValid()
+    {
+        var user = CreateValidUser();
+
+        var keep = RefreshToken.Create(user.Id, "keep");
+        var revoke = RefreshToken.Create(user.Id, "revoke");
+
+        user.AddRefreshToken(keep);
+        user.AddRefreshToken(revoke);
+
+        user.RevokeAllRefreshTokensExcept("keep");
+
+        Assert.False(keep.IsRevoked);
+        Assert.True(revoke.IsRevoked);
+    }
+
+    [Fact]
+    public void RevokeAllRefreshTokensExcept_ShouldRevokeAllOtherTokens()
+    {
+        var user = CreateValidUser();
+
+        var keep = RefreshToken.Create(user.Id, "keep");
+        var revoke1 = RefreshToken.Create(user.Id, "r1");
+        var revoke2 = RefreshToken.Create(user.Id, "r2");
+
+        user.AddRefreshToken(keep);
+        user.AddRefreshToken(revoke1);
+        user.AddRefreshToken(revoke2);
+
+        user.RevokeAllRefreshTokensExcept("keep");
+
+        Assert.True(revoke1.IsRevoked);
+        Assert.True(revoke2.IsRevoked);
+        Assert.False(keep.IsRevoked);
+    }
+
     private static User CreateValidUser(string firstName = "Jane", string lastName = "Doe", string avatarUrl = ValidAvatarUrl) =>
         User.Create(firstName, lastName, Helpers.ValidEmail(), Helpers.ValidPhone(), avatarUrl);
 

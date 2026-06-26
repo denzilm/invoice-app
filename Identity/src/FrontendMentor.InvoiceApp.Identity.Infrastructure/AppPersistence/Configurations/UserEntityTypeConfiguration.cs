@@ -27,5 +27,8 @@ public sealed class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
 
         builder.HasIndex(["EmailAddress"], "IX_Users_EmailAddress").IsUnique();
         builder.HasIndex(["Status"], "IX_Users_Status");
+
+        builder.HasMany(x => x.UserIdentities).WithOne().HasForeignKey(u => u.UserId).IsRequired().OnDelete(DeleteBehavior.ClientSetNull);
+        builder.HasMany(x => x.RefreshTokens).WithOne().HasForeignKey(r => r.UserId).IsRequired().OnDelete(DeleteBehavior.ClientSetNull);
     }
 }

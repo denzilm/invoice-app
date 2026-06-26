@@ -4,6 +4,7 @@ using FrontendMentor.InvoiceApp.Identity.Infrastructure.AppPersistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FrontendMentor.InvoiceApp.Identity.Infrastructure.AppPersistence.Migrations
 {
     [DbContext(typeof(IdentityAppDbContext))]
-    partial class IdentityAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260626234637_AddUserRefreshTokens")]
+    partial class AddUserRefreshTokens
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
