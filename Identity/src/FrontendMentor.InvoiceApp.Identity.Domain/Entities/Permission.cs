@@ -5,7 +5,7 @@ namespace FrontendMentor.InvoiceApp.Identity.Domain.Entities;
 
 public sealed class Permission : EntityBase<Guid>
 {
-    private Permission(Guid id, string name, string description, PermissionStatusEnum status)
+    public Permission(Guid id, string name, string description, PermissionStatusEnum status)
         : base(id)
     {
         Name = name;
