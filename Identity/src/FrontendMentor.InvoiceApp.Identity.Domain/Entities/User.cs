@@ -30,6 +30,9 @@ public sealed class User : EntityBase<Guid>
     private readonly List<UserIdentity> _userIdentities = [];
     public IReadOnlyList<UserIdentity> UserIdentities => _userIdentities.AsReadOnly();
 
+    private readonly List<RefreshToken> _refreshTokens = [];
+    public IReadOnlyList<RefreshToken> RefreshTokens => _refreshTokens.AsReadOnly();
+
     public string FullName => $"{FirstName} {LastName}";
 
     public static User Create(
@@ -66,4 +69,63 @@ public sealed class User : EntityBase<Guid>
         _userIdentities.Add(identity);
     }
 
+    public bool TryGetValidRefreshToken(string tokenHash, out RefreshToken? refreshToken)
+    {
+        refreshToken = _refreshTokens.FirstOrDefault(rt => rt.TokenHash == tokenHash && rt.IsValid);
+        return refreshToken is not null;
+    }
+
+    public void AddRefreshToken(RefreshToken refreshToken)
+    {
+        if (refreshToken.UserId != Id)
+            throw new InvalidOperationException("Refresh token does not belong to this user");
+        if (refreshToken.IsExpired)
+            throw new InvalidOperationException("Cannot add an expired refresh token.");
+        if (_refreshTokens.Any(rt => rt.TokenHash == refreshToken.TokenHash))
+            throw new InvalidOperationException("A refresh token with the same hash already exists for this user.");
+
+        _refreshTokens.Add(refreshToken);
+    }
+
+    public void RotateRefreshToken(string currentHash, string newHash)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(currentHash);
+        ArgumentException.ThrowIfNullOrWhiteSpace(newHash);
+
+        if (_refreshTokens.Any(rt => rt.TokenHash == newHash))
+            throw new InvalidOperationException(
+                "A refresh token with the same hash already exists for this user.");
+
+        if (!TryGetValidRefreshToken(currentHash, out var refreshToken))
+            throw new InvalidOperationException(
+                "Refresh token is invalid or does not exist.");
+
+        refreshToken!.Rotate(newHash);
+    }
+
+    public void RevokeRefreshToken(string tokenHash)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(tokenHash);
+
+        var refreshToken = _refreshTokens.FirstOrDefault(rt => rt.TokenHash == tokenHash);
+        if (refreshToken is null)
+            throw new InvalidOperationException("Refresh token not found.");
+
+        if (refreshToken.IsRevoked)
+            throw new InvalidOperationException("Refresh token is already revoked.");
+
+        refreshToken.Revoke();
+    }
+
+    public void RevokeAllRefreshTokens()
+    {
+        foreach (var token in _refreshTokens.Where(rt => rt.IsValid))
+            token.Revoke();
+    }
+
+    public void RevokeAllRefreshTokensExcept(string tokenHash)
+    {
+        foreach (var token in _refreshTokens.Where(rt => rt.IsValid && rt.TokenHash != tokenHash))
+            token.Revoke();
+    }
 }
