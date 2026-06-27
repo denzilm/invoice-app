@@ -33,6 +33,9 @@ public sealed class User : EntityBase<Guid>
     private readonly List<RefreshToken> _refreshTokens = [];
     public IReadOnlyList<RefreshToken> RefreshTokens => _refreshTokens.AsReadOnly();
 
+    private readonly List<UserAccessGrant> _accessGrants = [];
+    public IReadOnlyList<UserAccessGrant> AccessGrants => _accessGrants.AsReadOnly();
+
     public string FullName => $"{FirstName} {LastName}";
 
     public static User Create(
@@ -67,6 +70,70 @@ public sealed class User : EntityBase<Guid>
         }
 
         _userIdentities.Add(identity);
+    }
+
+    public void AssignRole(Guid grantedByUserId, Guid? companyId, Role role)
+    {
+        if (grantedByUserId == Guid.Empty)
+            throw new ArgumentException("Granted by user id cannot be empty.", nameof(grantedByUserId));
+
+        if (_accessGrants.Any(ag => ag.RoleId == role.Id && ag.IsActive))
+        {
+            throw new InvalidOperationException("This user already has an active grant for the specified role.");
+        }
+
+        if (role.IsGlobal && companyId is not null)
+        {
+            throw new InvalidOperationException($"The role '{role.Name}' is global role and cannot be assigned to a company.");
+        }
+
+        var accessGrant = UserAccessGrant.Create(grantedByUserId, Id, companyId, role);
+        _accessGrants.Add(accessGrant);
+    }
+
+    public void AssignPermission(Guid grantedByUserId, Guid? companyId, Permission permission)
+    {
+        if (grantedByUserId == Guid.Empty)
+            throw new ArgumentException("Granted by user id cannot be empty.", nameof(grantedByUserId));
+
+        var hasPermissionGrant = _accessGrants.Any(ag => ag.PermissionId == permission.Id && ag.IsActive);
+        var hasPermissionGrantViaRole = _accessGrants
+            .Where(ag => ag.RoleId is not null && ag.IsActive)
+            .SelectMany(ag => ag.Role!.RolePermissions)
+            .Any(rp => rp.PermissionId == permission.Id);
+
+        if (hasPermissionGrant || hasPermissionGrantViaRole)
+        {
+            throw new InvalidOperationException("This user already has an active grant for the specified permission.");
+        }
+
+        var grant = UserAccessGrant.Create(grantedByUserId, Id, companyId, role: null, permission);
+        _accessGrants.Add(grant);
+    }
+
+    public void RevokeRole(Guid roleId, Guid revokedByUserId)
+    {
+        if (roleId == Guid.Empty)
+            throw new ArgumentException("Role id cannot be empty.", nameof(roleId));
+        var accessGrant = _accessGrants.FirstOrDefault(ag => ag.RoleId == roleId && ag.IsActive);
+        if (accessGrant is null)
+            throw new InvalidOperationException("No active grant found for the specified role.");
+
+        accessGrant.Revoke(revokedByUserId);
+    }
+
+    public void RevokePermission(Guid permissionId, Guid revokedByUserId)
+    {
+        if (permissionId == Guid.Empty)
+            throw new ArgumentException("Permission id cannot be empty.", nameof(permissionId));
+        if (revokedByUserId == Guid.Empty)
+            throw new ArgumentException("Revoked by user id cannot be empty.", nameof(revokedByUserId));
+
+        var accessGrant = _accessGrants.FirstOrDefault(ag => ag.PermissionId == permissionId && ag.IsActive);
+        if (accessGrant is null)
+            throw new InvalidOperationException("No active grant found for the specified permission.");
+
+        accessGrant.Revoke(revokedByUserId);
     }
 
     public bool TryGetValidRefreshToken(string tokenHash, out RefreshToken? refreshToken)

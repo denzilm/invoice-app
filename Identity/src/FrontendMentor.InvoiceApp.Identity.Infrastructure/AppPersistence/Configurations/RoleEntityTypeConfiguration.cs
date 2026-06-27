@@ -14,6 +14,7 @@ public sealed class RoleEntityTypeConfiguration : IEntityTypeConfiguration<Role>
         builder.Property(x => x.Name).HasMaxLength(255).IsRequired();
         builder.Property(x => x.Description).HasMaxLength(255).IsRequired();
         builder.Property(x => x.Status).HasColumnName("StatusId").HasConversion(x => x.Value, x => RoleStatusEnum.FromValue(x)).IsRequired();
+        builder.Property(x => x.IsGlobal).HasDefaultValue(false).IsRequired();
 
         builder.HasIndex(r => r.Name, "UQ_Roles_Name").IsUnique();
 

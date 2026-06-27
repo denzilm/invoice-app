@@ -424,9 +424,197 @@ public class UserTests
         Assert.False(keep.IsRevoked);
     }
 
+    // -----------------------------
+    // AssignPermission
+    // -----------------------------
+
+    [Fact]
+    public void AssignPermission_ShouldAddPermissionGrant()
+    {
+        // Arrange
+        var user = CreateValidUser();
+        var grantedBy = Guid.NewGuid();
+        var permission = CreatePermission();
+
+        // Act
+        user.AssignPermission(grantedBy, null, permission);
+
+        // Assert
+        var grant = Assert.Single(user.AccessGrants);
+        Assert.Equal(permission.Id, grant.PermissionId);
+        Assert.True(grant.IsActive);
+    }
+
+    [Fact]
+    public void AssignPermission_ShouldThrow_WhenPermissionAlreadyGrantedDirectly()
+    {
+        // Arrange
+        var user = CreateValidUser();
+        var grantedBy = Guid.NewGuid();
+        var permission = CreatePermission();
+
+        user.AssignPermission(grantedBy, null, permission);
+
+        // Act & Assert
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            user.AssignPermission(grantedBy, null, permission));
+
+        Assert.Equal(
+            "This user already has an active grant for the specified permission.",
+            ex.Message);
+    }
+
+    [Fact]
+    public void AssignPermission_ShouldAllowPermission_WhenPreviousGrantIsRevoked()
+    {
+        // Arrange
+        var user = CreateValidUser();
+        var grantedBy = Guid.NewGuid();
+        var permission = CreatePermission();
+
+        user.AssignPermission(grantedBy, null, permission);
+        user.RevokePermission(permission.Id, grantedBy);
+
+        // Act
+        user.AssignPermission(grantedBy, null, permission);
+
+        // Assert
+        Assert.Equal(
+            2,
+            user.AccessGrants.Count(ag => ag.PermissionId == permission.Id));
+
+        Assert.Single(user.AccessGrants, ag =>
+                ag.PermissionId == permission.Id &&
+                ag.IsActive);
+    }
+
+    // -----------------------------
+    // RevokePermission
+    // -----------------------------
+
+    [Fact]
+    public void RevokePermission_ShouldRevokeActiveGrant()
+    {
+        // Arrange
+        var user = CreateValidUser();
+        var grantedBy = Guid.NewGuid();
+        var permission = CreatePermission();
+
+        user.AssignPermission(grantedBy, null, permission);
+
+        // Act
+        user.RevokePermission(permission.Id, grantedBy);
+
+        // Assert
+        Assert.False(user.AccessGrants.Single().IsActive);
+    }
+
+    [Fact]
+    public void RevokePermission_ShouldThrow_WhenPermissionGrantDoesNotExist()
+    {
+        // Arrange
+        var user = CreateValidUser();
+
+        // Act & Assert
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            user.RevokePermission(Guid.NewGuid(), Guid.NewGuid()));
+
+        Assert.Equal(
+            "No active grant found for the specified permission.",
+            ex.Message);
+    }
+
+    [Fact]
+    public void RevokePermission_ShouldThrow_WhenPermissionGrantAlreadyRevoked()
+    {
+        // Arrange
+        var user = CreateValidUser();
+        var grantedBy = Guid.NewGuid();
+        var permission = CreatePermission();
+
+        user.AssignPermission(grantedBy, null, permission);
+        user.RevokePermission(permission.Id, grantedBy);
+
+        // Act & Assert
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            user.RevokePermission(permission.Id, grantedBy));
+
+        Assert.Equal(
+            "No active grant found for the specified permission.",
+            ex.Message);
+    }
+
+    // -----------------------------
+    // RevokeRole
+    // -----------------------------
+
+    [Fact]
+    public void RevokeRole_ShouldRevokeActiveGrant()
+    {
+        // Arrange
+        var user = CreateValidUser();
+        var grantedBy = Guid.NewGuid();
+
+        var role = CreateRole();
+
+        user.AssignRole(grantedBy, null, role);
+
+        // Act
+        user.RevokeRole(role.Id, grantedBy);
+
+        // Assert
+        Assert.False(user.AccessGrants.Single().IsActive);
+    }
+
+    [Fact]
+    public void RevokeRole_ShouldThrow_WhenRoleGrantDoesNotExist()
+    {
+        // Arrange
+        var user = CreateValidUser();
+
+        // Act & Assert
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            user.RevokeRole(Guid.NewGuid(), Guid.NewGuid()));
+
+        Assert.Equal(
+            "No active grant found for the specified role.",
+            ex.Message);
+    }
+
+    [Fact]
+    public void RevokeRole_ShouldThrow_WhenRoleGrantAlreadyRevoked()
+    {
+        // Arrange
+        var user = CreateValidUser();
+        var grantedBy = Guid.NewGuid();
+
+        var role = CreateRole();
+
+        user.AssignRole(grantedBy, null, role);
+        user.RevokeRole(role.Id, grantedBy);
+
+        // Act & Assert
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            user.RevokeRole(role.Id, grantedBy));
+
+        Assert.Equal(
+            "No active grant found for the specified role.",
+            ex.Message);
+    }
+
     private static User CreateValidUser(string firstName = "Jane", string lastName = "Doe", string avatarUrl = ValidAvatarUrl) =>
         User.Create(firstName, lastName, Helpers.ValidEmail(), Helpers.ValidPhone(), avatarUrl);
 
     private static UserIdentity MakeIdentity(LoginProviderEnum provider, string key = "ac123") =>
         new(Guid.NewGuid(), provider, key);
+
+    private static Permission CreatePermission()
+    {
+        return new Permission(Guid.NewGuid(), "TestPermission", "A test permission", PermissionStatusEnum.Active);
+    }
+
+    private static Role CreateRole()
+    {
+        return new Role(Guid.NewGuid(), "TestRole", "A test role", RoleStatusEnum.Active, false);
+    }
 }
